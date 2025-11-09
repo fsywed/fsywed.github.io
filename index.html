@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎来到我的空间 - 请先登记</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .visitor-form {
+            margin: 30px 0;
+        }
+        .form-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .btn {
+            background: linear-gradient(45deg, #FF512F, #F09819);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+        .privacy-note {
+            margin-top: 20px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        .emoji {
+            font-size: 3em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">👋</div>
+        <h1>欢迎访问！</h1>
+        <p class="subtitle">在体验航天模拟器之前，请先简单登记一下</p>
+        
+        <div class="visitor-form">
+            <div class="form-group">
+                <label for="visitorName">你的称呼：</label>
+                <input type="text" id="visitorName" placeholder="请输入你的名字或昵称" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="visitorNote">留言（可选）：</label>
+                <textarea id="visitorNote" placeholder="想说点什么吗？或者告诉我你是怎么找到这里的..."></textarea>
+            </div>
+            
+            <button class="btn" onclick="registerAndRedirect()">🚀 登记并开始游戏</button>
+            <button class="btn btn-secondary" onclick="skipToGame()">⏩ 跳过直接游戏</button>
+        </div>
+        
+        <p class="privacy-note">
+            注意：登记信息仅保存在你的浏览器本地，用于让我知道有哪些朋友来访过。
+        </p>
+    </div>
+
+    <!-- 引入访问者记录脚本 -->
+    <script src="visitor-log.js"></script>
+    
+    <script>
+        function registerAndRedirect() {
+            const name = document.getElementById('visitorName').value.trim();
+            const note = document.getElementById('visitorNote').value.trim();
+            
+            if (!name) {
+                alert('请至少输入你的称呼！');
+                return;
+            }
+            
+            // 记录访问者信息
+            registerVisitor(name, note);
+            
+            // 跳转到游戏页面
+            window.location.href = 'game.html';
+        }
+        
+        function skipToGame() {
+            // 即使跳过也记录为匿名访问
+            registerVisitor('匿名访问者', '选择了跳过登记');
+            window.location.href = 'game.html';
+        }
+        
+        // 页面加载时显示访问统计
+        window.addEventListener('DOMContentLoaded', function() {
+            displayQuickStats();
+        });
+    </script>
+</body>
+</html>
