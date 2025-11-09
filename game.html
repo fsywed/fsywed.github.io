@@ -2,150 +2,182 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的游戏大厅</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>游戏大厅 - 我的空间</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
+            -webkit-overflow-scrolling: touch;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
+            margin: 20px 0 30px 0;
+            padding: 0 15px;
+            width: 100%;
         }
         
         .header h1 {
-            font-size: 3em;
+            font-size: 2em;
             margin-bottom: 10px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
         .header p {
-            font-size: 1.2em;
+            font-size: 1.1em;
             opacity: 0.9;
         }
         
         .games-container {
             display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 1200px;
+            flex-direction: column;
+            gap: 20px;
             width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
         }
         
         .game-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 25px 20px;
             text-align: center;
-            width: 350px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+            width: 100%;
         }
         
         .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.18);
         }
         
         .game-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
+            font-size: 3.5em;
+            margin-bottom: 15px;
         }
         
         .game-title {
-            font-size: 1.8em;
-            margin-bottom: 15px;
+            font-size: 1.6em;
+            margin-bottom: 12px;
             color: #ffd700;
         }
         
         .game-description {
-            margin-bottom: 25px;
-            line-height: 1.6;
+            margin-bottom: 20px;
+            line-height: 1.5;
             opacity: 0.9;
+            font-size: 1em;
         }
         
         .play-btn {
-            background: linear-gradient(45deg, #FF512F, #F09819);
+            background: linear-gradient(45deg, #FF416C, #FF4B2B);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 16px 35px;
             font-size: 1.1em;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
             width: 100%;
             font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
         }
         
         .play-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 81, 47, 0.4);
-        }
-        
-        .shooting-btn {
-            background: linear-gradient(45deg, #FF416C, #FF4B2B);
+            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
         }
         
         .survival-btn {
             background: linear-gradient(45deg, #0072FF, #00C6FF);
         }
         
-        .game-frame {
-            width: 100%;
-            height: 600px;
-            border: none;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
-        }
-        
         .back-btn {
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 25px;
+            border-radius: 25px;
             cursor: pointer;
-            margin-top: 20px;
-            display: none;
+            margin: 25px 0;
+            font-size: 1em;
+            transition: background 0.3s;
         }
         
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
         
-        @media (max-width: 768px) {
-            .games-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .game-card {
-                width: 100%;
-                max-width: 400px;
-            }
+        .game-frame {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            background: white;
+        }
+        
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+        
+        .wechat-tips {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.85em;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* 微信加载提示 */
+        #wechatLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
     </style>
 </head>
 <body>
+    <div id="wechatLoading">
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3em; margin-bottom: 20px;">🎮</div>
+            <h1>游戏大厅加载中...</h1>
+            <p>请耐心等待</p>
+        </div>
+    </div>
+
     <div class="header">
         <h1>🎮 我的游戏大厅</h1>
         <p>选择你喜欢的游戏开始冒险！</p>
@@ -153,181 +185,140 @@
     
     <div class="games-container" id="gamesContainer">
         <!-- 射击类游戏卡片 -->
-        <div class="game-card" onclick="openGame('shooting')">
+        <div class="game-card">
             <div class="game-icon">🔫</div>
-            <h2 class="game-title">Shell Shockers</h2>
+            <h2 class="game-title">Krunker.io</h2>
             <p class="game-description">
-                经典的蛋壳主题多人射击游戏！<br>
-                与其他玩家在线对战，展示你的射击技巧。
+                快节奏的3D像素风射击游戏！<br>
+                与全球玩家在线对战，多种武器选择。
             </p>
-            <button class="play-btn shooting-btn">开始射击游戏</button>
+            <button class="play-btn" onclick="openGame('shooting')">开始射击游戏</button>
         </div>
         
-        <!-- 生存类游戏卡片 -->
-        <div class="game-card" onclick="openGame('survival')">
-            <div class="game-icon">🚀</div>
-            <h2 class="game-title">Starblast</h2>
+        <!-- 新的生存类游戏卡片 -->
+        <div class="game-card">
+            <div class="game-icon">🌊</div>
+            <h2 class="game-title">Surviv.io</h2>
             <p class="game-description">
-                太空生存冒险游戏！<br>
-                升级飞船、采矿战斗，在宇宙中生存下去。
+                2D大逃杀生存游戏！<br>
+                收集武器装备，成为最后的幸存者。
             </p>
-            <button class="play-btn survival-btn">开始生存游戏</button>
+            <button class="play-btn survival-btn" onclick="openGame('survival')">开始生存游戏</button>
+        </div>
+
+        <!-- 新增休闲游戏卡片 -->
+        <div class="game-card">
+            <div class="game-icon">🧩</div>
+            <h2 class="game-title">Slither.io</h2>
+            <p class="game-description">
+                经典的贪吃蛇大作战！<br>
+                控制小蛇吃豆豆，变得更大更强。
+            </p>
+            <button class="play-btn" onclick="openGame('slither')">开始休闲游戏</button>
         </div>
     </div>
     
-    <!-- 射击游戏iframe -->
+    <!-- 游戏iframe -->
     <iframe 
         id="shootingGame" 
         class="game-frame" 
-        src="https://shellshock.io/" 
+        src="about:blank"
         allowfullscreen>
     </iframe>
     
-    <!-- 生存游戏iframe -->
     <iframe 
         id="survivalGame" 
         class="game-frame" 
-        src="https://starblast.io/" 
+        src="about:blank"
+        allowfullscreen>
+    </iframe>
+
+    <iframe 
+        id="slitherGame" 
+        class="game-frame" 
+        src="about:blank"
         allowfullscreen>
     </iframe>
     
     <!-- 返回按钮 -->
-    <button class="back-btn" onclick="backToMenu()">← 返回游戏大厅</button>
+    <button class="back-btn" onclick="backToMenu()" style="display: none;">← 返回游戏大厅</button>
+
+    <div class="wechat-tips">
+        <p>💡 如果游戏加载缓慢，请尝试在浏览器中打开</p>
+    </div>
 
     <script>
+        // 游戏URL配置 - 替换为更稳定的游戏源
+        const gameUrls = {
+            shooting: 'https://krunker.io/',
+            survival: 'https://surviv.io/',
+            slither: 'https://slither.io/'
+        };
+
         // 打开游戏函数
         function openGame(gameType) {
+            console.log(`🎯 尝试打开游戏: ${gameType}`);
+            
             // 隐藏游戏卡片
             document.getElementById('gamesContainer').style.display = 'none';
-            
-            // 显示对应的游戏iframe
-            if (gameType === 'shooting') {
-                document.getElementById('shootingGame').style.display = 'block';
-            } else if (gameType === 'survival') {
-                document.getElementById('survivalGame').style.display = 'block';
-            }
-            
-            // 显示返回按钮
             document.querySelector('.back-btn').style.display = 'block';
             
-            // 更新标题
-            document.querySelector('.header h1').textContent = 
-                gameType === 'shooting' ? '🔫 Shell Shockers' : '🚀 Starblast';
-            document.querySelector('.header p').textContent = '尽情享受游戏吧！';
+            // 显示加载提示
+            const loading = document.getElementById('wechatLoading');
+            loading.style.display = 'flex';
+            loading.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
+                    <h1>游戏加载中...</h1>
+                    <p>请耐心等待，这可能需要一些时间</p>
+                    <button onclick="backToMenu()" style="
+                        padding: 10px 20px;
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        border: none;
+                        border-radius: 20px;
+                        margin: 15px;
+                        cursor: pointer;
+                    ">取消加载</button>
+                </div>
+            `;
+            
+            // 设置iframe源并显示
+            setTimeout(() => {
+                const iframe = document.getElementById(gameType + 'Game');
+                if (iframe) {
+                    iframe.src = gameUrls[gameType];
+                    iframe.style.display = 'block';
+                    loading.style.display = 'none';
+                    
+                    // 更新标题
+                    document.querySelector('.header h1').textContent = 
+                        gameType === 'shooting' ? '🔫 Krunker.io' : 
+                        gameType === 'survival' ? '🌊 Surviv.io' : '🧩 Slither.io';
+                    document.querySelector('.header p').textContent = '尽情享受游戏吧！';
+                }
+            }, 2000);
         }
         
         // 返回菜单函数
         function backToMenu() {
-            // 隐藏所有游戏iframe
+            console.log('🔙 返回游戏大厅');
+            
+            // 隐藏所有游戏iframe并重置src
             document.getElementById('shootingGame').style.display = 'none';
             document.getElementById('survivalGame').style.display = 'none';
+            document.getElementById('slitherGame').style.display = 'none';
+            document.getElementById('shootingGame').src = 'about:blank';
+            document.getElementById('survivalGame').src = 'about:blank';
+            document.getElementById('slitherGame').src = 'about:blank';
             
             // 显示游戏卡片
             document.getElementById('gamesContainer').style.display = 'flex';
-            
-            // 隐藏返回按钮
             document.querySelector('.back-btn').style.display = 'none';
+            document.getElementById('wechatLoading').style.display = 'none';
             
             // 恢复标题
             document.querySelector('.header h1').textContent = '🎮 我的游戏大厅';
             document.querySelector('.header p').textContent = '选择你喜欢的游戏开始冒险！';
         }
-        
-        // 添加键盘快捷键支持
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                backToMenu();
-            }
-        });
-    </script>
-</body>
-</html>        </div>
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <p>撞到陨石得分！目前分数: <span id="score">0</span></p>
-    </div>
-
-    <script>
-        // 简化版的游戏代码，确保能运行
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let score = 0;
-
-        // 飞船对象
-        const ship = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            rotation: 0,
-            speed: 0
-        };
-
-        // 键盘控制
-        const keys = {};
-        window.addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; });
-        window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
-
-        function drawShip() {
-            ctx.save();
-            ctx.translate(ship.x, ship.y);
-            ctx.rotate(ship.rotation);
-            
-            // 绘制飞船
-            ctx.fillStyle = '#3498db';
-            ctx.beginPath();
-            ctx.moveTo(15, 0);
-            ctx.lineTo(-10, -8);
-            ctx.lineTo(-10, 8);
-            ctx.closePath();
-            ctx.fill();
-            
-            // 火焰效果
-            if (keys['w']) {
-                ctx.fillStyle = '#e74c3c';
-                ctx.beginPath();
-                ctx.moveTo(-10, 0);
-                ctx.lineTo(-20, -4);
-                ctx.lineTo(-20, 4);
-                ctx.closePath();
-                ctx.fill();
-            }
-            
-            ctx.restore();
-        }
-
-        function update() {
-            // 旋转控制
-            if (keys['a']) ship.rotation -= 0.05;
-            if (keys['d']) ship.rotation += 0.05;
-            
-            // 移动控制
-            if (keys['w']) {
-                ship.speed = 3;
-            } else {
-                ship.speed *= 0.95;
-            }
-            
-            ship.x += Math.cos(ship.rotation) * ship.speed;
-            ship.y += Math.sin(ship.rotation) * ship.speed;
-            
-            // 边界检测
-            if (ship.x < 0) ship.x = canvas.width;
-            if (ship.x > canvas.width) ship.x = 0;
-            if (ship.y < 0) ship.y = canvas.height;
-            if (ship.y > canvas.height) ship.y = 0;
-        }
-
-        function gameLoop() {
-            // 清空画布
-            ctx.fillStyle = 'rgba(0, 20, 40, 0.3)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            update();
-            drawShip();
-            
-            requestAnimationFrame(gameLoop);
-        }
-
-        // 启动游戏
-        gameLoop();
-    </script>
-</body>
-</html>
+      
