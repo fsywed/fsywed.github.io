@@ -2,10 +2,11 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <!-- 微信专用视口配置 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>游戏大厅 - 我的空间</title>
+    <title>欢迎来到我的空间 - 请先登记</title>
     <style>
         * {
             margin: 0;
@@ -15,26 +16,275 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 15px;
             -webkit-overflow-scrolling: touch;
         }
         
-        .header {
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 500px;
             text-align: center;
-            margin: 20px 0 30px 0;
-            padding: 0 15px;
-            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 90%;
         }
         
-        .header h1 {
-            font-size: 2em;
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+        
+        .subtitle {
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .visitor-form {
+            margin: 30px 0;
+        }
+        
+        .form-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px; /* 防止微信自动缩放 */
+            box-sizing: border-box;
+            -webkit-appearance: none;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #FF512F, #F09819);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: calc(100% - 20px);
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+        
+        .privacy-note {
+            margin-top: 20px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        
+        .emoji {
+            font-size: 3em;
+            margin: 10px 0;
+        }
+
+        /* 微信加载提示 */
+        #wechatLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .wechat-tips {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 微信加载提示 -->
+    <div id="wechatLoading">
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3em; margin-bottom: 20px;">👋</div>
+            <h1>加载中...</h1>
+            <p>请耐心等待页面加载</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="emoji">👋</div>
+        <h1>欢迎访问！</h1>
+        <p class="subtitle">在体验航天模拟器之前，请先简单登记一下</p>
+        
+        <div class="visitor-form">
+            <div class="form-group">
+                <label for="visitorName">你的称呼：</label>
+                <input type="text" id="visitorName" placeholder="请输入你的名字或昵称" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="visitorNote">留言（可选）：</label>
+                <textarea id="visitorNote" placeholder="想说点什么吗？或者告诉我你是怎么找到这里的..."></textarea>
+            </div>
+            
+            <button class="btn" onclick="registerAndRedirect()">🚀 登记并开始游戏</button>
+            <button class="btn btn-secondary" onclick="skipToGame()">⏩ 跳过直接游戏</button>
+        </div>
+        
+        <div class="wechat-tips">
+            <p>💡 微信使用提示：如果页面显示异常，请点击右上角"···"选择"在浏览器中打开"</p>
+        </div>
+
+        <p class="privacy-note">
+            注意：登记信息仅保存在你的浏览器本地，用于让我知道有哪些朋友来访过。
+        </p>
+    </div>
+
+    <script>
+        // 页面加载完成后隐藏加载提示
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loading = document.getElementById('wechatLoading');
+                if (loading) {
+                    loading.style.opacity = '0';
+                    setTimeout(() => loading.style.display = 'none', 500);
+                }
+            }, 1500);
+        });
+
+        function registerAndRedirect() {
+            const name = document.getElementById('visitorName').value.trim();
+            const note = document.getElementById('visitorNote').value.trim();
+            
+            if (!name) {
+                alert('请至少输入你的称呼！');
+                return;
+            }
+            
+            // 记录访问者信息到本地存储
+            registerVisitor(name, note);
+            
+            // 跳转到游戏页面
+            window.location.href = 'game.html';
+        }
+        
+        function skipToGame() {
+            // 即使跳过也记录为匿名访问
+            registerVisitor('匿名访问者', '选择了跳过登记');
+            window.location.href = 'game.html';
+        }
+        
+        // 记录访问者信息到本地存储
+        function registerVisitor(name, note = '') {
+            let visitors = JSON.parse(localStorage.getItem('siteVisitors') || '[]');
+            
+            visitors.push({
+                name: name,
+                note: note,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                screenSize: `${screen.width}×${screen.height}`
+            });
+            
+            // 只保留最近20条记录
+            if (visitors.length > 20) {
+                visitors = visitors.slice(-20);
+            }
+            
+            localStorage.setItem('siteVisitors', JSON.stringify(visitors));
+            
+            // 更新访问统计
+            updateVisitStats();
+            
+            console.log(`访问者登记: ${name}`);
+        }
+
+        // 更新访问统计
+        function updateVisitStats() {
+            let stats = JSON.parse(localStorage.getItem('visitStats') || '{}');
+            
+            stats.totalVisits = (stats.totalVisits || 0) + 1;
+            stats.lastVisit = new Date().toISOString();
+            
+            if (!stats.firstVisit) {
+                stats.firstVisit = new Date().toISOString();
+            }
+            
+            localStorage.setItem('visitStats', JSON.stringify(stats));
+        }
+
+        // 显示快速统计
+        function displayQuickStats() {
+            const stats = JSON.parse(localStorage.getItem('visitStats') || '{}');
+            const visitors = JSON.parse(localStorage.getItem('siteVisitors') || '[]');
+            
+            if (stats.totalVisits) {
+                console.log(`本站已被访问 ${stats.totalVisits} 次`);
+                console.log(`已有 ${visitors.length} 位朋友登记`);
+            }
+        }
+
+        // 页面加载时显示访问统计
+        window.addEventListener('DOMContentLoaded', function() {
+            displayQuickStats();
+        });
+
+        // 错误处理
+        window.addEventListener('error', function(e) {
+            console.error('页面错误:', e);
+        });
+
+        // 诊断信息
+        console.log('🛠️ 首页诊断信息:');
+        console.log('📍 用户代理:', navigator.userAgent);
+        console.log('📱 屏幕尺寸:', screen.width, 'x', screen.height);
+        console.log('🌐 当前域名:', window.location.hostname);
+    </script>
+</body>
+</html>            font-size: 2em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
