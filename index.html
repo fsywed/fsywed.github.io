@@ -2,11 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 微信专用视口配置 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>欢迎来到我的空间 - 请先登记</title>
+    <title>游戏大厅 - 我的空间</title>
     <style>
         * {
             margin: 0;
@@ -16,25 +15,313 @@
         }
         
         body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            padding: 15px;
             -webkit-overflow-scrolling: touch;
         }
         
-        .container {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            max-width: 500px;
+        .header {
             text-align: center;
+            margin: 20px 0 30px 0;
+            padding: 0 15px;
+            width: 100%;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .games-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 25px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.18);
+        }
+        
+        .game-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+        
+        .game-title {
+            font-size: 1.6em;
+            margin-bottom: 12px;
+            color: #ffd700;
+        }
+        
+        .game-description {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            opacity: 0.9;
+            font-size: 1em;
+        }
+        
+        .play-btn {
+            background: linear-gradient(45deg, #FF416C, #FF4B2B);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
+        }
+        
+        .survival-btn {
+            background: linear-gradient(45deg, #0072FF, #00C6FF);
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 25px 0;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .game-frame {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            background: white;
+        }
+        
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+        
+        .wechat-tips {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.85em;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* 微信加载提示 */
+        #wechatLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="wechatLoading">
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3em; margin-bottom: 20px;">🎮</div>
+            <h1>游戏大厅加载中...</h1>
+            <p>请耐心等待</p>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>🎮 我的游戏大厅</h1>
+        <p>选择你喜欢的游戏开始冒险！</p>
+    </div>
+    
+    <div class="games-container" id="gamesContainer">
+        <!-- 射击类游戏卡片 -->
+        <div class="game-card">
+            <div class="game-icon">🔫</div>
+            <h2 class="game-title">Krunker.io</h2>
+            <p class="game-description">
+                快节奏的3D像素风射击游戏！<br>
+                与全球玩家在线对战，多种武器选择。
+            </p>
+            <button class="play-btn" onclick="openGame('shooting')">开始射击游戏</button>
+        </div>
+        
+        <!-- 新的生存类游戏卡片 -->
+        <div class="game-card">
+            <div class="game-icon">🌊</div>
+            <h2 class="game-title">Surviv.io</h2>
+            <p class="game-description">
+                2D大逃杀生存游戏！<br>
+                收集武器装备，成为最后的幸存者。
+            </p>
+            <button class="play-btn survival-btn" onclick="openGame('survival')">开始生存游戏</button>
+        </div>
+
+        <!-- 新增休闲游戏卡片 -->
+        <div class="game-card">
+            <div class="game-icon">🧩</div>
+            <h2 class="game-title">Slither.io</h2>
+            <p class="game-description">
+                经典的贪吃蛇大作战！<br>
+                控制小蛇吃豆豆，变得更大更强。
+            </p>
+            <button class="play-btn" onclick="openGame('slither')">开始休闲游戏</button>
+        </div>
+    </div>
+    
+    <!-- 游戏iframe -->
+    <iframe 
+        id="shootingGame" 
+        class="game-frame" 
+        src="about:blank"
+        allowfullscreen>
+    </iframe>
+    
+    <iframe 
+        id="survivalGame" 
+        class="game-frame" 
+        src="about:blank"
+        allowfullscreen>
+    </iframe>
+
+    <iframe 
+        id="slitherGame" 
+        class="game-frame" 
+        src="about:blank"
+        allowfullscreen>
+    </iframe>
+    
+    <!-- 返回按钮 -->
+    <button class="back-btn" onclick="backToMenu()" style="display: none;">← 返回游戏大厅</button>
+
+    <div class="wechat-tips">
+        <p>💡 如果游戏加载缓慢，请尝试在浏览器中打开</p>
+    </div>
+
+    <script>
+        // 游戏URL配置 - 替换为更稳定的游戏源
+        const gameUrls = {
+            shooting: 'https://krunker.io/',
+            survival: 'https://surviv.io/',
+            slither: 'https://slither.io/'
+        };
+
+        // 打开游戏函数
+        function openGame(gameType) {
+            console.log(`🎯 尝试打开游戏: ${gameType}`);
+            
+            // 隐藏游戏卡片
+            document.getElementById('gamesContainer').style.display = 'none';
+            document.querySelector('.back-btn').style.display = 'block';
+            
+            // 显示加载提示
+            const loading = document.getElementById('wechatLoading');
+            loading.style.display = 'flex';
+            loading.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
+                    <h1>游戏加载中...</h1>
+                    <p>请耐心等待，这可能需要一些时间</p>
+                    <button onclick="backToMenu()" style="
+                        padding: 10px 20px;
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        border: none;
+                        border-radius: 20px;
+                        margin: 15px;
+                        cursor: pointer;
+                    ">取消加载</button>
+                </div>
+            `;
+            
+            // 设置iframe源并显示
+            setTimeout(() => {
+                const iframe = document.getElementById(gameType + 'Game');
+                if (iframe) {
+                    iframe.src = gameUrls[gameType];
+                    iframe.style.display = 'block';
+                    loading.style.display = 'none';
+                    
+                    // 更新标题
+                    document.querySelector('.header h1').textContent = 
+                        gameType === 'shooting' ? '🔫 Krunker.io' : 
+                        gameType === 'survival' ? '🌊 Surviv.io' : '🧩 Slither.io';
+                    document.querySelector('.header p').textContent = '尽情享受游戏吧！';
+                }
+            }, 2000);
+        }
+        
+        // 返回菜单函数
+        function backToMenu() {
+            console.log('🔙 返回游戏大厅');
+            
+            // 隐藏所有游戏iframe并重置src
+            document.getElementById('shootingGame').style.display = 'none';
+            document.getElementById('survivalGame').style.display = 'none';
+            document.getElementById('slitherGame').style.display = 'none';
+            document.getElementById('shootingGame').src = 'about:blank';
+            document.getElementById('survivalGame').src = 'about:blank';
+            document.getElementById('slitherGame').src = 'about:blank';
+            
+            // 显示游戏卡片
+            document.getElementById('gamesContainer').style.display = 'flex';
+            document.querySelector('.back-btn').style.display = 'none';
+            document.getElementById('wechatLoading').style.display = 'none';
+            
+            // 恢复标题
+            document.querySelector('.header h1').textContent = '🎮 我的游戏大厅';
+            document.querySelector('.header p').textContent = '选择你喜欢的游戏开始冒险！';
+        }
+                  text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             width: 90%;
