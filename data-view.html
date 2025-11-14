@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问数据查看</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        h1 { color: #333; text-align: center; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .data-table th { background: #4CAF50; color: white; }
+        .data-table tr:nth-child(even) { background: #f2f2f2; }
+        .stats { background: #e8f4fd; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .refresh-btn { background: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 网站访问数据查看</h1>
+        
+        <div class="stats">
+            <h3>📈 数据统计</h3>
+            <p>总访问记录: <span id="totalCount">0</span> 条</p>
+            <p>最后更新时间: <span id="lastUpdate">-</span></p>
+            <button class="refresh-btn" onclick="loadData()">🔄 刷新数据</button>
+        </div>
+
+        <div id="dataContainer">
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <script>
+        // 这里后面会添加数据加载代码
+        async function loadData() {
+            document.getElementById('dataContainer').innerHTML = '<p>正在从Vercel日志加载数据...</p>';
+            
+            // 模拟数据 - 实际这里需要调用API获取Vercel日志
+            const sampleData = [
+                { name: '测试用户1', message: '这个网站很棒！', timestamp: '2024-01-09T10:30:00Z', website: 'https://fsywed.github.io' },
+                { name: '测试用户2', message: '游戏很好玩', timestamp: '2024-01-09T11:15:00Z', website: 'https://fsywed.github.io' }
+            ];
+            
+            displayData(sampleData);
+        }
+
+        function displayData(data) {
+            const container = document.getElementById('dataContainer');
+            const totalCount = document.getElementById('totalCount');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p>暂无数据</p>';
+                totalCount.textContent = '0';
+                return;
+            }
+            
+            totalCount.textContent = data.length;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('zh-CN');
+            
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>留言</th>
+                            <th>时间</th>
+                            <th>来源</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            data.forEach(item => {
+                html += `
+                    <tr>
+                        <td><strong>${escapeHtml(item.name)}</strong></td>
+                        <td>${escapeHtml(item.message || '无留言')}</td>
+                        <td>${new Date(item.timestamp).toLocaleString('zh-CN')}</td>
+                        <td>${escapeHtml(item.website || '未知')}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 页面加载时自动加载数据
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+</html>
