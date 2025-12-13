@@ -18,6 +18,18 @@ textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-f
 .button:hover{background:#1177bb}
 .select{background:#3c3c3c;color:white;border:1px solid #007acc;padding:5px;border-radius:3px}
 .controls{padding:10px;background:#252526;border-top:1px solid #333}
+
+/* 新增：编辑器行号 */
+.editor-wrapper{display:flex;flex:1;overflow:hidden}
+.line-numbers{background:#2d2d2d;color:#858585;padding:15px 5px;font-family:'Consolas','Monaco',monospace;font-size:14px;line-height:1.5;text-align:right;user-select:none;overflow:hidden}
+.line-numbers div{padding-right:10px}
+
+/* 新增：状态栏 */
+.status-bar{background:#007acc;color:white;padding:5px 15px;font-size:12px;display:flex;justify-content:space-between}
+
+/* 新增：错误提示 */
+.error-toast{position:fixed;bottom:20px;right:20px;background:#f44336;color:white;padding:15px;border-radius:5px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:none;z-index:1000}
+.error-toast.show{display:block}
 </style>
 </head>
 <body>
@@ -37,6 +49,8 @@ textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-f
 <option value="full">完整网页</option>
 </select>
 </div>
+<div class="editor-wrapper">
+<div class="line-numbers" id="lineNumbers">1</div>
 <textarea id="codeInput" placeholder="在这里输入你的代码...">
 <!DOCTYPE html>
 <html>
@@ -67,6 +81,7 @@ textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-f
         <h1>你好！这是一个示例</h1>
         <p>编辑左侧代码，右侧会实时变化</p>
         <button onclick="showMessage()">点击测试</button>
+        <p id="currentTime"></p>
     </div>
     
     <script>
@@ -88,6 +103,11 @@ textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-f
 </html>
 </textarea>
 </div>
+<div class="status-bar" id="editorStatus">
+<span>行: 1, 列: 1</span>
+<span id="charCount">0 字符</span>
+</div>
+</div>
 
 <div class="preview-panel">
 <div class="panel-header">
@@ -96,9 +116,14 @@ textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-f
 <button class="button" onclick="runCode()">▶️ 运行代码</button>
 <button class="button" onclick="saveCode()">💾 保存代码</button>
 <button class="button" onclick="loadExample()">📋 加载示例</button>
+<button class="button" onclick="clearCode()">🗑️ 清空</button>
 </div>
 </div>
 <iframe id="iframePreview" sandbox="allow-scripts allow-same-origin"></iframe>
+<div class="status-bar">
+<span id="previewStatus">就绪</span>
+<span id="lastRun">-</span>
+</div>
 </div>
 </div>
 
@@ -106,43 +131,118 @@ textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-f
 <label style="margin-right:15px;">
 <input type="checkbox" id="autoRefresh" checked> 自动刷新
 </label>
+<label style="margin-right:15px;">
+<input type="checkbox" id="lineNumbersToggle" checked> 显示行号
+</label>
+<select id="refreshRate" style="background:#3c3c3c;color:white;border:1px solid #007acc;padding:5px;border-radius:3px;margin-left:10px">
+<option value="500">刷新延迟: 0.5秒</option>
+<option value="1000" selected>刷新延迟: 1秒</option>
+<option value="2000">刷新延迟: 2秒</option>
+<option value="5000">刷新延迟: 5秒</option>
+</select>
 <span style="color:#888;margin-left:20px;">提示：输入代码后预览会自动更新（如果启用了自动刷新）</span>
 </div>
+
+<div class="error-toast" id="errorToast">错误信息</div>
 
 <script>
 const codeInput=document.getElementById('codeInput');
 const iframePreview=document.getElementById('iframePreview');
 const codeTypeSelect=document.getElementById('codeType');
 const autoRefreshCheckbox=document.getElementById('autoRefresh');
+const lineNumbers=document.getElementById('lineNumbers');
+const lineNumbersToggle=document.getElementById('lineNumbersToggle');
+const refreshRateSelect=document.getElementById('refreshRate');
+const editorStatus=document.getElementById('editorStatus');
+const charCount=document.getElementById('charCount');
+const previewStatus=document.getElementById('previewStatus');
+const lastRun=document.getElementById('lastRun');
+const errorToast=document.getElementById('errorToast');
 
 let autoRefreshTimer;
+let lastRunTime=null;
+
+// 更新行号
+function updateLineNumbers(){
+    if(!lineNumbersToggle.checked){
+        lineNumbers.style.display='none';
+        return;
+    }
+    lineNumbers.style.display='block';
+    const lines=codeInput.value.split('\n').length;
+    lineNumbers.innerHTML='';
+    for(let i=1;i<=lines;i++){
+        const lineDiv=document.createElement('div');
+        lineDiv.textContent=i;
+        lineNumbers.appendChild(lineDiv);
+    }
+}
+
+// 更新光标位置
+function updateCursorPosition(){
+    const cursorPos=codeInput.selectionStart;
+    const textBeforeCursor=codeInput.value.substring(0,cursorPos);
+    const line=textBeforeCursor.split('\n').length;
+    const column=textBeforeCursor.split('\n').pop().length+1;
+    editorStatus.children[0].textContent=`行: ${line}, 列: ${column}`;
+}
+
+// 更新字符统计
+function updateCharCount(){
+    const count=codeInput.value.length;
+    charCount.textContent=`${count} 字符`;
+}
 
 // 运行代码
 function runCode(){
-    const code=codeInput.value;
-    const type=codeTypeSelect.value;
-    let fullHTML='';
-    
-    if(type==='full'){
-        fullHTML=code;
-    }else if(type==='html'){
-        fullHTML=`<!DOCTYPE html><html><head><style>body{font-family:Arial;padding:20px}</style></head><body>${code}</body></html>`;
-    }else if(type==='css'){
-        fullHTML=`<!DOCTYPE html><html><head><style>${code}</style></head><body><div class="demo">CSS效果预览</div></body></html>`;
-    }else if(type==='js'){
-        fullHTML=`<!DOCTYPE html><html><head></head><body><script>try{${code}}catch(e){document.body.innerHTML='<div style=\"color:red;padding:20px\">错误: '+e.message+'</div>'}</script><div id="output"></div></body></html>`;
+    try{
+        const code=codeInput.value;
+        const type=codeTypeSelect.value;
+        let fullHTML='';
+        
+        if(type==='full'){
+            fullHTML=code;
+        }else if(type==='html'){
+            fullHTML=`<!DOCTYPE html><html><head><style>body{font-family:Arial;padding:20px}</style></head><body>${code}</body></html>`;
+        }else if(type==='css'){
+            fullHTML=`<!DOCTYPE html><html><head><style>${code}</style></head><body><div class="demo">CSS效果预览</div></body></html>`;
+        }else if(type==='js'){
+            fullHTML=`<!DOCTYPE html><html><head></head><body><script>try{${code}}catch(e){document.body.innerHTML='<div style="color:red;padding:20px">错误: '+e.message+'</div>'}<\\/script><div id="output"></div></body></html>`;
+        }
+        
+        iframePreview.srcdoc=fullHTML;
+        previewStatus.textContent='运行成功';
+        lastRunTime=new Date();
+        lastRun.textContent=lastRunTime.toLocaleTimeString('zh-CN');
+        
+        // 隐藏错误提示
+        errorToast.classList.remove('show');
+    }catch(error){
+        showError(`运行错误: ${error.message}`);
     }
-    
-    iframePreview.srcdoc=fullHTML;
+}
+
+// 显示错误提示
+function showError(message){
+    errorToast.textContent=message;
+    errorToast.classList.add('show');
+    setTimeout(()=>{
+        errorToast.classList.remove('show');
+    },5000);
 }
 
 // 保存代码到本地存储
 function saveCode(){
-    const code=codeInput.value;
-    const type=codeTypeSelect.value;
-    const key=`savedCode_${type}`;
-    localStorage.setItem(key,code);
-    alert('代码已保存到浏览器本地存储！');
+    try{
+        const code=codeInput.value;
+        const type=codeTypeSelect.value;
+        const key=`savedCode_${type}`;
+        localStorage.setItem(key,code);
+        previewStatus.textContent='保存成功';
+        showError('✅ 代码已保存到浏览器本地存储！');
+    }catch(error){
+        showError(`保存失败: ${error.message}`);
+    }
 }
 
 // 加载示例代码
@@ -154,7 +254,10 @@ function loadExample(){
     <li>列表项 1</li>
     <li>列表项 2</li>
     <li>列表项 3</li>
-</ul>`,
+</ul>
+<div style="margin-top:20px">
+    <button onclick="alert('Hello!')">点击我</button>
+</div>`,
         css:`body {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
@@ -170,12 +273,24 @@ function loadExample(){
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s;
 }
 
 .button:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
 }`,
         js:`// JavaScript示例
 console.log('代码开始执行');
@@ -193,72 +308,18 @@ document.body.innerHTML = \`
     <div style="text-align:center;padding:40px;">
         <h1>JavaScript 演示</h1>
         <p id="counter">点击次数: 0</p>
-        <button onclick="updateCounter()">点击我</button>
-        <button onclick="count=0;updateCounter()">重置</button>
+        <button onclick="updateCounter()" style="margin:5px">点击我</button>
+        <button onclick="count=0;updateCounter()" style="margin:5px">重置</button>
+        <button onclick="alert('当前计数: ' + count)" style="margin:5px">显示计数</button>
     </div>
-\`;`
-    };
-    
-    const type=codeTypeSelect.value;
-    if(type!=='full'&&examples[type]){
-        codeInput.value=examples[type];
-        runCode();
-    }
-}
+\`;
 
-// 自动刷新功能
-function setupAutoRefresh(){
-    clearInterval(autoRefreshTimer);
-    if(autoRefreshCheckbox.checked){
-        autoRefreshTimer=setInterval(runCode,1000);
-    }
-}
-
-// 事件监听
-codeInput.addEventListener('input',()=>{
-    if(autoRefreshCheckbox.checked){
-        clearInterval(autoRefreshTimer);
-        autoRefreshTimer=setTimeout(runCode,500);
-    }
-});
-
-codeTypeSelect.addEventListener('change',()=>{
-    const key=`savedCode_${codeTypeSelect.value}`;
-    const saved=localStorage.getItem(key);
-    if(saved){
-        if(confirm('加载上次保存的代码？')){
-            codeInput.value=saved;
-        }
-    }
-    runCode();
-});
-
-autoRefreshCheckbox.addEventListener('change',setupAutoRefresh);
-
-// 初始化
-function init(){
-    const savedFull=localStorage.getItem('savedCode_full');
-    if(savedFull){
-        codeInput.value=savedFull;
-    }
-    runCode();
-    setupAutoRefresh();
-}
-
-// 页面加载完成
-window.addEventListener('load',init);
-
-// 添加键盘快捷键
-document.addEventListener('keydown',(e)=>{
-    if(e.ctrlKey&&e.key==='s'){
-        e.preventDefault();
-        saveCode();
-    }
-    if(e.ctrlKey&&e.key==='r'){
-        e.preventDefault();
-        runCode();
-    }
-});
-</script>
-</body>
-</html>
+// 自动更新显示
+updateCounter();`,
+        full:`<!DOCTYPE html>
+<html>
+<head>
+    <title>完整示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 
