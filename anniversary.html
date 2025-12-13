@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏆 建站时长纪念</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d);color:white;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.header{margin-bottom:40px}
+.site-title{font-size:2.8em;margin-bottom:15px;background:linear-gradient(45deg,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 2px 10px rgba(0,0,0,0.3)}
+.timer-container{background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);border-radius:25px;padding:40px;border:1px solid rgba(255,255,255,0.2);box-shadow:0 15px 35px rgba(0,0,0,0.3);max-width:900px;width:100%}
+.time-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin:30px 0}
+.time-unit{background:rgba(0,0,0,0.3);padding:25px;border-radius:15px;border:1px solid rgba(255,255,255,0.15);transition:all 0.3s}
+.time-unit:hover{transform:translateY(-8px);background:rgba(255,255,255,0.15);box-shadow:0 10px 20px rgba(0,0,0,0.2)}
+.time-number{font-size:3.2em;font-weight:800;margin-bottom:8px;color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.5)}
+.time-label{font-size:1.1em;color:rgba(255,255,255,0.85);letter-spacing:1px}
+.details{background:rgba(0,0,0,0.25);padding:25px;border-radius:15px;margin-top:35px;border-left:5px solid #4CAF50}
+.detail-item{margin:12px 0;font-size:1.15em;display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.1)}
+.progress-container{margin:40px 0}
+.progress-bar{height:12px;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#4CAF50,#8BC34A);width:0%;transition:width 0.5s}
+.milestones{display:flex;justify-content:space-around;flex-wrap:wrap;margin-top:40px;gap:20px}
+.milestone{background:rgba(255,255,255,0.1);padding:20px;border-radius:15px;min-width:180px;border:2px solid transparent;transition:all 0.3s}
+.milestone.achieved{border-color:#4CAF50;background:rgba(76,175,80,0.15)}
+.milestone h3{color:#ffd700;margin-bottom:10px}
+.share-buttons{display:flex;gap:15px;justify-content:center;margin-top:30px}
+.btn{padding:12px 25px;border:none;border-radius:8px;font-size:1em;cursor:pointer;transition:all 0.3s;font-weight:600}
+.btn-primary{background:linear-gradient(45deg,#FF416C,#FF4B2B);color:white}
+.btn-secondary{background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3)}
+.btn:hover{transform:scale(1.05);box-shadow:0 5px 15px rgba(0,0,0,0.3)}
+.footer{margin-top:50px;color:rgba(255,255,255,0.7);font-size:0.9em}
+@media(max-width:768px){.time-grid{grid-template-columns:repeat(2,1fr)}.time-number{font-size:2.5em}.site-title{font-size:2em}}
+</style>
+</head>
+<body>
+<div class="header">
+<h1 class="site-title">🚀 fsywed 的建站时长纪念</h1>
+<p>从 2025年11月9日 起，我的网站已经运行了：</p>
+</div>
+
+<div class="timer-container">
+<div class="time-grid">
+<div class="time-unit"><div class="time-number" id="years">0</div><div class="time-label">年</div></div>
+<div class="time-unit"><div class="time-number" id="months">0</div><div class="time-label">月</div></div>
+<div class="time-unit"><div class="time-number" id="days">0</div><div class="time-label">天</div></div>
+<div class="time-unit"><div class="time-number" id="hours">0</div><div class="time-label">小时</div></div>
+<div class="time-unit"><div class="time-number" id="minutes">0</div><div class="time-label">分钟</div></div>
+<div class="time-unit"><div class="time-number" id="seconds">0</div><div class="time-label">秒</div></div>
+</div>
+
+<div class="progress-container">
+<p>本年进度：<span id="year-progress">0</span>%</p>
+<div class="progress-bar"><div class="progress-fill" id="year-progress-bar"></div></div>
+</div>
+
+<div class="details">
+<h2>📅 详细时间统计</h2>
+<div class="detail-item"><span>建站日期：</span><span id="start-date">2025-11-09</span></div>
+<div class="detail-item"><span>当前时间：</span><span id="current-date">正在加载...</span></div>
+<div class="detail-item"><span>总计天数：</span><span id="total-days">0</span> 天</div>
+<div class="detail-item"><span>总计小时：</span><span id="total-hours">0</span> 小时</div>
+<div class="detail-item"><span>总计分钟：</span><span id="total-minutes">0</span> 分钟</div>
+<div class="detail-item"><span>总计秒数：</span><span id="total-seconds">0</span> 秒</div>
+</div>
+
+<div class="milestones">
+<div class="milestone"><h3>🎯 第一周</h3><p>完成基础搭建</p><p id="milestone-1">计算中...</p></div>
+<div class="milestone"><h3>🚀 第一个月</h3><p>功能完善阶段</p><p id="milestone-2">计算中...</p></div>
+<div class="milestone"><h3>🌟 100天</h3><p>稳定运行期</p><p id="milestone-3">计算中...</p></div>
+<div class="milestone"><h3>🏆 一周年</h3><p>长期运营目标</p><p id="milestone-4">计算中...</p></div>
+</div>
+
+<div class="share-buttons">
+<button class="btn btn-primary" onclick="shareResult()">📱 分享成就</button>
+<button class="btn btn-secondary" onclick="toggleTheme()">🌙 切换主题</button>
+<button class="btn btn-secondary" onclick="refreshTime()">🔄 刷新时间</button>
+</div>
+</div>
+
+<div class="footer">
+<p>本页面实时计算，每秒更新 | 由 fsywed 的建站之旅驱动</p>
+<p>© 2025-<span id="current-year"></span> fsywed.github.io</p>
+</div>
+
+<script>
+// 设置建站开始时间（2025年11月9日）
+const startDate=new Date('2025-11-09T00:00:00');
+
+function updateTimer(){
+const now=new Date();
+const diff=now-startDate;
+
+// 如果当前时间早于建站时间，显示倒计时模式
+if(diff<0){
+showCountdown(Math.abs(diff));
+return;
+}
+
+// 计算各个时间单位
+const seconds=Math.floor(diff/1000);
+const minutes=Math.floor(seconds/60);
+const hours=Math.floor(minutes/60);
+const days=Math.floor(hours/24);
+const months=Math.floor(days/30.44);
+const years=Math.floor(days/365.25);
+
+// 计算余数
+const remainingDays=days-Math.floor(years*365.25)-Math.floor((months%12)*30.44);
+const remainingHours=hours%24;
+const remainingMinutes=minutes%60;
+const remainingSeconds=seconds%60;
+
+// 更新显示
+document.getElementById('years').textContent=years;
+document.getElementById('months').textContent=months%12;
+document.getElementById('days').textContent=Math.floor(remainingDays);
+document.getElementById('hours').textContent=remainingHours;
+document.getElementById('minutes').textContent=remainingMinutes;
+document.getElementById('seconds').textContent=remainingSeconds;
+
+// 更新详细信息
+document.getElementById('current-date').textContent=now.toLocaleString('zh-CN');
+document.getElementById('total-days').textContent=days;
+document.getElementById('total-hours').textContent=hours;
+document.getElementById('total-minutes').textContent=minutes;
+document.getElementById('total-seconds').textContent=seconds;
+
+// 更新本年进度
+const yearStart=new Date(now.getFullYear(),0,1);
+const yearEnd=new Date(now.getFullYear()+1,0,1);
+const yearProgress=((now-yearStart)/(yearEnd-yearStart)*100).toFixed(2);
+document.getElementById('year-progress').textContent=yearProgress;
+document.getElementById('year-progress-bar').style.width=`${yearProgress}%`;
+
+// 更新里程碑
+updateMilestones(days);
+}
+
+// 倒计时模式（如果当前时间早于建站时间）
+function showCountdown(diff){
+const seconds=Math.floor(diff/1000);
+const minutes=Math.floor(seconds/60);
+const hours=Math.floor(minutes/60);
+const days=Math.floor(hours/24);
+
+document.getElementById('years').textContent=0;
+document.getElementById('months').textContent=0;
+document.getElementById('days').textContent=days;
+document.getElementById('hours').textContent=hours%24;
+document.getElementById('minutes').textContent=minutes%60;
+document.getElementById('seconds').textContent=seconds%60;
+
+document.getElementById('current-date').textContent=new Date().toLocaleString('zh-CN');
+document.querySelector('.header p').textContent=`距离 2025年11月9日 建站还有：`;
+}
+
+function updateMilestones(days){
+const milestone1=document.getElementById('milestone-1');
+const milestone2=document.getElementById('milestone-2');
+const milestone3=document.getElementById('milestone-3');
+const milestone4=document.getElementById('milestone-4');
+
+// 第一周里程碑
+if(days>=7){
+milestone1.innerHTML='✅ 已达成';
+milestone1.parentElement.classList.add('achieved');
+}else{
+milestone1.innerHTML=`还剩 ${7-days} 天`;
+}
+
+// 第一个月里程碑
+if(days>=30){
+milestone2.innerHTML='✅ 已达成';
+milestone2.parentElement.classList.add('achieved');
+}else{
+milestone2.innerHTML=`还剩 ${30-days} 天`;
+}
+
+// 100天里程碑
+if(days>=100){
+milestone3.innerHTML='✅ 已达成';
+milestone3.parentElement.classList.add('achieved');
+}else{
+milestone3.innerHTML=`还剩 ${100-days} 天`;
+}
+
+// 一周年里程碑
+if(days>=365){
+milestone4.innerHTML='✅ 已达成';
+milestone4.parentElement.classList.add('achieved');
+}else{
+milestone4.innerHTML=`还剩 ${365-days} 天`;
+}
+}
+
+function shareResult(){
+const now=new Date();
+const diff=now-startDate;
+const days=Math.floor(diff/(1000*60*60*24));
+
+const shareText=`🎉 我的网站已稳定运行 ${days} 天！\n从2025年11月9日至今，持续更新与改进。\n\n查看我的建站时长：${window.location.href}`;
+
+if(navigator.share){
+navigator.share({
+title:'我的建站时长',
+text:shareText,
+url:window.location.href
+});
+}else{
+navigator.clipboard.writeText(shareText).then(()=>{
+alert('分享内容已复制到剪贴板！');
+});
+}
+}
+
+function toggleTheme(){
+document.body.classList.toggle('dark-theme');
+}
+
+function refreshTime(){
+updateTimer();
+}
+
+// 设置当前年份
+document.getElementById('current-year').textContent=new Date().getFullYear();
+
+// 每秒更新一次
+setInterval(updateTimer,1000);
+// 立即执行一次
+updateTimer();
+</script>
+</body>
+</html>
