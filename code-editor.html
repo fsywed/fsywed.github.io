@@ -1,158 +1,194 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>在线代码预览器</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column}
-.header{background:#007acc;color:white;padding:15px;text-align:center}
-.container{display:flex;flex:1;overflow:hidden}
-.editor-panel,.preview-panel{flex:1;display:flex;flex-direction:column}
-.panel-header{background:#252526;padding:10px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
-textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:15px;font-family:Consolas,monospace;font-size:14px;resize:none;outline:none}
-#iframePreview{flex:1;border:none;background:white}
-.button{background:#0e639c;color:white;border:none;padding:8px 15px;border-radius:3px;cursor:pointer;margin-left:5px}
-.button:hover{background:#1177bb}
-.controls{padding:10px;background:#252526;border-top:1px solid #333}
-</style>
-</head>
-<body>
-<div class="header">
-<h2>在线代码预览器</h2>
-<p>编辑代码，实时查看效果（支持HTML/CSS/JS）</p>
-</div>
-
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>代码预览器</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column}.header{background:#007acc;color:white;padding:10px;text-align:center}.container{display:flex;flex:1;overflow:hidden}.panel{flex:1;display:flex;flex-direction:column}.panel-header{background:#252526;padding:6px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:10px;font-family:Consolas,monospace;font-size:14px;resize:none;outline:none}#preview{flex:1;border:none;background:white}.button{background:#0e639c;color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;margin-left:3px;font-size:13px}.controls{padding:5px;background:#252526;border-top:1px solid #333;font-size:13px}.fullscreen{background:#d35400}.github{background:#28a745}#dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#252526;padding:15px;border-radius:5px;box-shadow:0 5px 20px rgba(0,0,0,0.5);z-index:1000;display:none;width:350px}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999;display:none}.file-status{margin:8px 0;padding:5px;background:#1a1a1a;border-radius:3px;font-size:12px}</style></head><body>
+<div class="header"><h2 style="font-size:1.2rem;margin:0">代码预览器</h2><p style="margin:3px 0;font-size:0.8rem">编辑代码，实时预览</p></div>
 <div class="container">
-<div class="editor-panel">
-<div class="panel-header">
-<span>代码编辑器</span>
-<select id="codeType">
-<option value="html">HTML</option>
-<option value="css">CSS</option>
-<option value="js">JavaScript</option>
-<option value="full">完整网页</option>
-</select>
-</div>
-<textarea id="codeInput" placeholder="在这里输入代码...">
-<!DOCTYPE html>
+<div class="panel"><div class="panel-header"><span>编辑器</span><select id="type" style="background:#1e1e1e;color:#d4d4d4;border:1px solid #444;padding:3px;font-size:12px"><option value="html">HTML</option><option value="css">CSS</option><option value="js">JS</option><option value="full">完整</option></select></div>
+<textarea id="code"><!DOCTYPE html>
 <html>
-<head>
-<style>
-body { font-family: Arial; padding: 20px; }
-.demo-box { 
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white; 
-  padding: 30px; 
-  border-radius: 10px;
-  text-align: center;
-  margin: 20px 0;
-}
-</style>
-</head>
 <body>
-<div class="demo-box">
-  <h1>测试页面</h1>
-  <p>编辑左侧代码</p>
-  <button onclick="alert('测试')">点击</button>
-</div>
-<script>
-console.log('测试');
-</script>
+<h1>测试</h1>
 </body>
-</html>
-</textarea>
+</html></textarea>
 </div>
-
-<div class="preview-panel">
-<div class="panel-header">
-<span>实时预览</span>
-<div>
-<button class="button" onclick="runCode()">运行</button>
-<button class="button" onclick="saveCode()">保存</button>
-<button class="button" onclick="loadExample()">示例</button>
+<div class="panel"><div class="panel-header"><span>预览</span><div><button class="button" onclick="R()">运行</button><button class="button" onclick="E()">示例</button><button class="button fullscreen" onclick="F()">全屏</button><button class="button github" onclick="D()">提交</button></div></div>
+<iframe id="preview"></iframe></div></div>
+<div class="controls"><label><input type="checkbox" id="auto" checked style="margin-right:3px">自动刷新</label><span id="status" style="margin-left:5px">就绪</span></div>
+<div class="overlay" onclick="H()"></div>
+<div id="dialog">
+<div style="display:flex;justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;font-size:1rem">提交到GitHub</h3><span onclick="H()" style="cursor:pointer">×</span></div>
+<input id="file" placeholder="文件名" oninput="C()" style="width:100%;padding:6px;margin-bottom:6px;background:#1e1e1e;border:1px solid #444;color:#d4d4d4;border-radius:3px">
+<textarea id="msg" placeholder="说明" rows="2" style="width:100%;padding:6px;margin-bottom:6px;background:#1e1e1e;border:1px solid #444;color:#d4d4d4;border-radius:4px">代码预览器提交</textarea>
+<input id="token" placeholder="GitHub令牌" oninput="C()" style="width:100%;padding:6px;margin-bottom:6px;background:#1e1e1e;border:1px solid #444;color:#d4d4d4;border-radius:3px">
+<div id="fs" class="file-status">等待输入</div>
+<div style="text-align:right;margin-top:8px">
+<button class="button" onclick="H()" style="background:#666;margin-right:4px">取消</button>
+<button class="button github" onclick="S()">提交</button>
 </div>
 </div>
-<iframe id="iframePreview"></iframe>
-</div>
-</div>
-
-<div class="controls">
-<label><input type="checkbox" id="autoRefresh" checked> 自动刷新</label>
-</div>
-
 <script>
-const codeInput=document.getElementById('codeInput');
-const iframePreview=document.getElementById('iframePreview');
-const codeTypeSelect=document.getElementById('codeType');
-const autoRefresh=document.getElementById('autoRefresh');
-let refreshTimer;
+let sha=null,checking=false;
 
-// 修复运行函数
-function runCode(){
-  const code=codeInput.value;
-  const type=codeTypeSelect.value;
-  let fullHTML='';
-  
-  if(type==='full'){
-    fullHTML=code;
-  }else if(type==='html'){
-    fullHTML='<!DOCTYPE html><html><head><style>body{padding:20px}</style></head><body>'+code+'</body></html>';
-  }else if(type==='css'){
-    fullHTML='<!DOCTYPE html><html><head><style>'+code+'</style></head><body><div>CSS预览</div></body></html>';
-  }else if(type==='js'){
-    fullHTML='<!DOCTYPE html><html><body><script>try{'+code+'}catch(e){console.error(e)}<\/script></body></html>';
-  }
-  
-  // 正确设置iframe内容
-  iframePreview.srcdoc=fullHTML;
-  console.log('代码已运行');
+// 基本功能
+function R(){
+    let c=document.getElementById('code').value,t=document.getElementById('type').value,h='';
+    if(t==='full')h=c;
+    else if(t==='html')h='<!DOCTYPE html><html><head><style>body{padding:10px}</style></head><body>'+c+'</body></html>';
+    else if(t==='css')h='<!DOCTYPE html><html><head><style>'+c+'</style></head><body><div>CSS预览</div></body></html>';
+    else if(t==='js')h='<!DOCTYPE html><html><body><script>try{'+c+'}catch(e){console.error(e)}<\/script></body></html>';
+    document.getElementById('preview').srcdoc=h;
+    document.getElementById('status').textContent='已更新';
 }
 
-// 保存代码
-function saveCode(){
-  localStorage.setItem('code',codeInput.value);
-  alert('已保存');
+function E(){
+    let t=document.getElementById('type').value,e='<h2>示例</h2>';
+    if(t==='css')e='body{background:#f0f0f0}';
+    else if(t==='js')e='console.log("示例");';
+    document.getElementById('code').value=e;
+    R();
 }
 
-// 加载示例
-function loadExample(){
-  const type=codeTypeSelect.value;
-  let example='';
-  
-  if(type==='html'){
-    example='<h1>标题</h1><p>段落</p><button onclick="alert(\'点击\')">按钮</button>';
-  }else if(type==='css'){
-    example='body{background:#f0f0f0;padding:20px}\n.button{background:blue;color:white;padding:10px}';
-  }else if(type==='js'){
-    example='document.body.innerHTML="<h1>JS运行成功</h1>";\nalert("测试");';
-  }else{
-    example='<!DOCTYPE html><html><body><h1>完整示例</h1></body></html>';
-  }
-  
-  codeInput.value=example;
-  runCode();
+function F(){
+    let p=document.querySelector('.panel:last-child');
+    if(!document.fullscreenElement){
+        p.requestFullscreen?p.requestFullscreen():p.webkitRequestFullscreen?p.webkitRequestFullscreen():p.mozRequestFullScreen&&p.mozRequestFullScreen();
+        document.querySelector('.fullscreen').textContent='退出';
+    }else{
+        document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?document.webkitExitFullscreen():document.mozCancelFullScreen&&document.mozCancelFullScreen();
+        document.querySelector('.fullscreen').textContent='全屏';
+    }
 }
 
-// 自动刷新
-codeInput.addEventListener('input',function(){
-  if(autoRefresh.checked){
-    clearTimeout(refreshTimer);
-    refreshTimer=setTimeout(runCode,500);
-  }
+// GitHub功能
+function D(){
+    document.getElementById('dialog').style.display='block';
+    document.querySelector('.overlay').style.display='block';
+    let t=localStorage.getItem('token');
+    if(t){
+        document.getElementById('token').value=t;
+        C();
+    }
+}
+
+function H(){
+    document.getElementById('dialog').style.display='none';
+    document.querySelector('.overlay').style.display='none';
+    sha=null;
+}
+
+// 修复：检查文件逻辑
+async function C(){
+    if(checking) return;
+    checking=true;
+    
+    let f=document.getElementById('file').value.trim();
+    let t=document.getElementById('token').value.trim();
+    let s=document.getElementById('fs');
+    
+    if(!f||!t){
+        s.textContent='等待输入';
+        sha=null;
+        checking=false;
+        return;
+    }
+    
+    // 验证令牌格式
+    if(!t.startsWith('ghp_')&&!t.startsWith('github_pat_')){
+        s.textContent='令牌格式错误';
+        sha=null;
+        checking=false;
+        return;
+    }
+    
+    s.textContent='检查中...';
+    
+    try{
+        let r=await fetch(`https://api.github.com/repos/fsywed/fsywed.github.io/contents/${f}`,{
+            headers:{'Authorization':'token '+t}
+        });
+        
+        if(r.ok){
+            let d=await r.json();
+            sha=d.sha;
+            s.textContent='📝 覆盖文件';
+        }else if(r.status===404){
+            sha=null;
+            s.textContent='📄 新建文件';
+        }else{
+            sha=null;
+            s.textContent='检查失败';
+        }
+    }catch(e){
+        sha=null;
+        s.textContent='网络错误';
+    }
+    
+    checking=false;
+}
+
+async function S(){
+    let f=document.getElementById('file').value.trim()||'test.html';
+    let t=document.getElementById('token').value.trim();
+    let m=document.getElementById('msg').value.trim();
+    let c=document.getElementById('code').value;
+    
+    if(!t||(!t.startsWith('ghp_')&&!t.startsWith('github_pat_'))){
+        alert('需要有效的GitHub令牌');
+        return;
+    }
+    
+    let b=document.querySelector('.github');
+    b.disabled=true;
+    b.textContent='提交中';
+    document.getElementById('status').textContent='提交中...';
+    
+    try{
+        let p={
+            message:m||`提交 ${new Date().toLocaleTimeString()}`,
+            content:btoa(unescape(encodeURIComponent(c))),
+            branch:'main'
+        };
+        
+        // 关键修复：只有确定有sha时才添加
+        if(sha!==null){
+            p.sha=sha;
+        }
+        
+        let r=await fetch(`https://api.github.com/repos/fsywed/fsywed.github.io/contents/${f}`,{
+            method:'PUT',
+            headers:{
+                'Authorization':'token '+t,
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(p)
+        });
+        
+        if(r.ok){
+            document.getElementById('status').textContent='✅ 成功';
+            alert(sha?'✅ 文件已覆盖':'✅ 文件已创建');
+            localStorage.setItem('token',t);
+            H();
+        }else{
+            let e=await r.json();
+            throw new Error(e.message||`错误 ${r.status}`);
+        }
+    }catch(e){
+        document.getElementById('status').textContent='❌ 失败';
+        alert('提交失败: '+e.message);
+    }finally{
+        b.disabled=false;
+        b.textContent='提交';
+    }
+}
+
+// 事件
+document.getElementById('code').addEventListener('input',function(){
+    if(document.getElementById('auto').checked){
+        clearTimeout(window.T);
+        window.T=setTimeout(R,500);
+    }
 });
 
-// 类型切换
-codeTypeSelect.addEventListener('change',function(){
-  runCode();
-});
-
-// 加载保存的代码
-window.addEventListener('load',function(){
-  const saved=localStorage.getItem('code');
-  if(saved) codeInput.value=saved;
-  runCode();
-});
+document.getElementById('type').addEventListener('change',R);
+window.addEventListener('load',R);
 </script>
 </body>
 </html>
