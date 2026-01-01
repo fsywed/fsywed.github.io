@@ -1,94 +1,74 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>欢迎访问</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial;background:linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d);color:white;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-.container{background:rgba(255,255,255,0.15);padding:40px;border-radius:20px;text-align:center;max-width:500px;width:90%;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2)}
-.emoji{font-size:4em;margin:15px 0}
-.btn{background:linear-gradient(45deg,#FF416C,#FF4B2B);color:white;border:none;padding:15px 30px;font-size:1.1em;border-radius:50px;cursor:pointer;margin:10px;width:calc(100% - 20px);font-weight:bold;transition:transform 0.2s}
-.btn:hover{transform:scale(1.05)}
-.btn-secondary{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3)}
-input,textarea{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;font-size:16px;background:rgba(255,255,255,0.9)}
-textarea{height:80px;resize:vertical}
-.loading{display:none;margin:10px 0;color:rgba(255,255,255,0.8)}
-</style>
-</head>
-<body>
-<div class="container">
-<div class="emoji">👋</div>
-<h1>欢迎访问！</h1>
-<p>在开始游戏前请先登记</p>
-<div style="margin:25px 0">
-<input type="text" id="visitorName" placeholder="你的名字（可选）">
-<textarea id="visitorNote" placeholder="留言（可选）"></textarea>
-<div class="loading" id="loadingIndicator">🚀 提交中，请稍候...</div>
-<button class="btn" onclick="registerAndRedirect()" id="submitBtn">🚀 登记并开始游戏</button>
-<button class="btn btn-secondary" onclick="skipToGame()">⏩ 跳过直接游戏</button>
-</div>
-</div>
+<!DOCTYPE html><html lang=zh><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>创意空间站</title><style>:root{--1:#1a2a6c;--2:#b21f1f;--3:#fdbb2d}*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:linear-gradient(135deg,var(--1),var(--2),var(--3));min-height:100vh}*:focus{outline:none}.nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 5%;background:rgba(255,255,255,0.95);position:sticky;top:0}.logo{font-size:1.5rem;font-weight:bold;color:#4361ee}.menu{display:flex;list-style:none;gap:1rem}.menu a{text-decoration:none;color:#333}.mbtn{display:none;background:none;border:none;width:44px;height:44px}.right{display:flex;align-items:center;gap:10px}.btn{background:linear-gradient(45deg,#f72585,#FF4B2B);color:white;border:none;padding:6px 12px;border-radius:15px;font-size:0.8em}.ctoggle{width:30px;height:30px;border-radius:50%;background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red);border:2px solid white}.cdrop{position:absolute;top:40px;right:0;background:#252525;border-radius:8px;padding:8px;display:none;flex-direction:column;gap:6px;z-index:100}.copt{width:25px;height:25px;border-radius:50%;border:2px solid white}.hero{text-align:center;padding:4rem 5%;margin:2rem auto;max-width:1000px;background:rgba(255,255,255,0.1);border-radius:15px;color:white}.hero h1{font-size:2.5rem;background:linear-gradient(45deg,#FF416C,#FF4B2B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.hero p{max-width:600px;margin:1rem auto}.icons{font-size:3em;margin:1.5rem 0}.cont{padding:0 5% 3rem}.title{text-align:center;margin:2rem 0;font-size:1.8rem;color:white}.grid{display:grid;grid-template-columns:1fr;gap:2rem}.row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center}.card{background:rgba(255,255,255,0.15);padding:2rem;border-radius:12px}.card h3{font-size:1.3rem;margin:0.5rem 0;color:white}.card p{color:rgba(255,255,255,0.9)}.jbtn{background:linear-gradient(45deg,#667eea,#764ba2);color:white;border:none;padding:0.8rem 2rem;border-radius:20px;margin-top:1rem}.foot{background:rgba(0,0,0,0.7);color:white;padding:2rem 5%;text-align:center;margin-top:3rem}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999;display:none}.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#2a2a3a;padding:1.5rem;border-radius:15px;z-index:1000;display:none;width:90vw;max-width:350px}.input{margin:1rem 0}.input input,.input textarea{width:100%;padding:0.8rem;border-radius:8px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2)}@media(max-width:768px){.menu{display:none;position:absolute;top:100%;left:0;width:100%;background:white;flex-direction:column;padding:0}.menu.active{display:flex}.menu li{width:100%}.menu a{padding:1rem;border-bottom:1px solid #eee;display:block}.mbtn{display:flex}.row{grid-template-columns:1fr}.hero h1{font-size:2rem}.hero p{font-size:0.9rem}.icons{font-size:2.5em}}</style></head><body>
+<nav class=nav><a href=# class=logo>🚀创意空间站</a><ul class=menu>
+<li><a href=#home data-i18n=nav.home>首页</a></li>
+<li><a href=#features data-i18n=nav.features>功能</a></li>
+<li><a href=#about data-i18n=nav.about>关于</a></li>
+<li><a href=#contact data-i18n=nav.contact>联系</a></li>
+</ul><div class=right><button class=btn onclick=TL()>EN</button>
+<div class=ctoggle onclick=TC(event)></div>
+<div class=cdrop id=cd><div class=copt style=background:#1a2a6c onclick=SC('#1a2a6c','#b21f1f','#fdbb2d')></div>
+<div class=copt style=background:#0f4c75 onclick=SC('#0f4c75','#3282b8','#bbe1fa')></div>
+<div class=copt style=background:#1a1a2e onclick=SC('#1a1a2e','#16213e','#0f3460')></div></div>
+<button class=btn onclick=SM() data-i18n=nav.login>登录</button>
+<button class=mbtn id=mb></button></div></nav>
+<main><section class=hero id=home><h1 data-i18n=hero.title>创意空间站</h1>
+<p data-i18n=hero.desc>融合游戏、创作与探索的现代化数字平台</p>
+<div class=icons>🎮💻📊</div></section><div class=cont>
+<h2 class=title id=features data-i18n=features.title>核心功能</h2>
+<div class=grid><div class=row><div class=card><div class=icons>🎮</div>
+<h3 data-i18n=modules.0.title>游戏大厅</h3>
+<p data-i18n=modules.0.desc>精选多款在线游戏，从休闲到冒险</p></div>
+<div class=card><h3 data-i18n=modules.0.btnDesc>即刻畅玩</h3>
+<button class=jbtn onclick="location.href='game.html'" data-i18n=modules.0.btnEnter>进入游戏 →</button></div></div>
+<div class=row><div class=card><h3 data-i18n=modules.1.btnDesc>在线编码</h3>
+<button class=jbtn onclick="location.href='code-editor.html'" data-i18n=modules.1.btnEnter>← 打开编辑器</button></div>
+<div class=card><div class=icons>💻</div><h3 data-i18n=modules.1.title>在线编辑器</h3>
+<p data-i18n=modules.1.desc>实时编写HTML/CSS/JavaScript代码</p></div></div>
+<div class=row><div class=card><div class=icons>📊</div><h3 data-i18n=modules.2.title>建站历程</h3>
+<p data-i18n=modules.2.desc>见证成长轨迹，查看里程碑记录</p></div>
+<div class=card><h3 data-i18n=modules.2.btnDesc>查看历程</h3>
+<button class=jbtn onclick="location.href='anniversary.html'" data-i18n=modules.2.btnEnter>查看时间 →</button></div></div></div></div></main>
+<footer class=foot id=contact><p data-i18n=footer.line1>© 2024 创意空间站</p>
+<p data-i18n=footer.line2>探索无限可能</p></footer>
+<div class=overlay onclick=HA()></div><div class=modal id=lm>
+<h3 data-i18n=modal.title>访问登记</h3><span onclick=HA() style=cursor:pointer>×</span>
+<div class=input><input id=un placeholder=名字></div>
+<div class=input><textarea id=note placeholder=留言></textarea></div>
+<div id=ls style=margin:1rem 0></div>
+<button class=btn onclick=HA() data-i18n=modal.cancel>取消</button>
+<button class=btn onclick=SL() data-i18n=modal.submit>🚀 登记</button></div>
 <script>
-async function sendToCloud(data){
-try{
-const response=await fetch('https://fsywed-github-lo-ylkz.vercel.app/api/save-message',{
-method:'POST',headers:{'Content-Type':'application/json'},
-body:JSON.stringify({
-name:data.userName||'系统记录',
-message:data.userNote||`动作:${data.action}`,
-timestamp:data.timestamp,
-action:data.action,
-screenSize:`${screen.width}x${screen.height}`,
-timezone:Intl.DateTimeFormat().resolvedOptions().timeZone
-})
-});
-if(response.ok){const result=await response.json();console.log('✅ 云端记录成功:',result);return true;}
-else{console.log('⚠️ 云端记录失败');return false;}
-}catch(error){console.log('🌐 网络错误:',error);return false;}
-}
-async function recordVisit(action,data={}){
-const visitData={
-action:action,
-timestamp:new Date().toISOString(),
-userName:data.userName,
-userNote:data.userNote,
-...data
-};
-await sendToCloud(visitData);
-}
-window.addEventListener('load',()=>recordVisit('homepage_visit'));
-async function registerAndRedirect(){
-const name=document.getElementById('visitorName').value.trim();
-const note=document.getElementById('visitorNote').value.trim();
-const userName=name||'匿名用户';
-const userNote=note||'无留言';
-showLoading(true);
-try{
-await recordVisit('user_registration',{userName:userName,userNote:userNote,hasName:!!name,hasNote:!!note});
-setTimeout(()=>window.location.href='game.html',500);
-}catch(error){
-console.error('登记失败:',error);
-showLoading(false);
-alert('登记失败，但您仍然可以继续游戏');
-window.location.href='game.html';
-}
-}
-function skipToGame(){
-recordVisit('skip_registration',{userName:'匿名跳过用户',userNote:'用户选择跳过登记',isSkipped:true});
-window.location.href='game.html';
-}
-function showLoading(show){
-const loading=document.getElementById('loadingIndicator');
-const submitBtn=document.getElementById('submitBtn');
-loading.style.display=show?'block':'none';
-submitBtn.disabled=show;
-submitBtn.textContent=show?'提交中...':'🚀 登记并开始游戏';
-submitBtn.style.opacity=show?'0.7':'1';
-}
-document.addEventListener('keypress',(e)=>e.key==='Enter'&&registerAndRedirect());
-window.addEventListener('load',()=>document.getElementById('visitorName').focus());
-</script>
-</body>
-</html>
+T={zh:{nav:{home:'首页',features:'功能',about:'关于',contact:'联系',login:'登录'},
+hero:{title:'创意空间站',desc:'融合游戏、创作与探索的现代化数字平台'},
+features:{title:'核心功能'},
+modules:[{title:'游戏大厅',desc:'精选多款在线游戏，从休闲到冒险',btnDesc:'即刻畅玩',btnEnter:'进入游戏 →'},
+{title:'在线编辑器',desc:'实时编写HTML/CSS/JavaScript代码',btnDesc:'在线编码',btnEnter:'← 打开编辑器'},
+{title:'建站历程',desc:'见证成长轨迹，查看里程碑记录',btnDesc:'查看历程',btnEnter:'查看时间 →'}],
+footer:{line1:'© 2024 创意空间站',line2:'探索无限可能'},
+modal:{title:'访问登记',cancel:'取消',submit:'🚀 登记'},
+status:{submitting:'提交中',success:'成功',fail:'失败',networkError:'网络错误'}},
+en:{nav:{home:'Home',features:'Features',about:'About',contact:'Contact',login:'Login'},
+hero:{title:'Creative Space',desc:'Modern platform for gaming, creation and exploration'},
+features:{title:'Core Features'},
+modules:[{title:'Game Hall',desc:'Selected online games',btnDesc:'Play Now',btnEnter:'Enter Games →'},
+{title:'Online Editor',desc:'Write HTML/CSS/JavaScript in real-time',btnDesc:'Code Online',btnEnter:'← Open Editor'},
+{title:'Site History',desc:'Track growth milestones',btnDesc:'View History',btnEnter:'View Time →'}],
+footer:{line1:'© 2024 Creative Space',line2:'Explore Possibilities'},
+modal:{title:'Access Registration',cancel:'Cancel',submit:'🚀 Register'},
+status:{submitting:'Submitting',success:'Success',fail:'Failed',networkError:'Network Error'}}}
+L='zh';function TL(){L=L=='zh'?'en':'zh';document.querySelector('.btn').textContent=L=='zh'?'EN':'中';UT()}
+function UT(){t=T[L];document.title=t.hero.title;document.querySelectorAll('[data-i18n]').forEach(e=>{
+k=e.getAttribute('data-i18n').split('.');v=k.reduce((o,i)=>o[i],t);if(v)e.textContent=v})}
+let CV=false;function TC(e){e.stopPropagation();d=document.getElementById('cd');CV=!CV;d.style.display=CV?'flex':'none'}
+function SC(a,b,c){document.documentElement.style.setProperty('--1',a);document.documentElement.style.setProperty('--2',b);document.documentElement.style.setProperty('--3',c);HA()}
+document.addEventListener('click',e=>{if(CV&&!e.target.closest('.ctoggle')&&!e.target.closest('#cd')){CV=false;document.getElementById('cd').style.display='none'}})
+function SM(){document.getElementById('lm').style.display='block';document.querySelector('.overlay').style.display='block'}
+function HA(){document.getElementById('cd').style.display='none';document.getElementById('lm').style.display='none';document.querySelector('.overlay').style.display='none';CV=false}
+function SL(){n=document.getElementById('un').value.trim();t=document.getElementById('note').value.trim();s=document.getElementById('ls');st=T[L].status
+s.textContent=st.submitting;s.style.color='#FF416C';fetch('https://fsywed-github-lo-ylkz.vercel.app/api/save-message',{method:'POST',
+headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n||'用户',message:t||'无',timestamp:new Date().toISOString()})})
+.then(r=>{s.textContent=r.ok?st.success:st.fail;s.style.color=r.ok?'#28a745':'#ffa726'})
+.catch(()=>{s.textContent=st.networkError;s.style.color='#ffa726'})}
+mb=document.getElementById('mb');nl=document.querySelector('.menu');mb.innerHTML='☰';mb.onclick=()=>{nl.classList.toggle('active');mb.innerHTML=nl.classList.contains('active')?'✕':'☰'}
+document.querySelectorAll('.menu a').forEach(l=>{l.onclick=e=>{nl.classList.remove('active');mb.innerHTML='☰';if(l.getAttribute('href').startsWith('#')){e.preventDefault()}}})
+</script></body></html></html>
