@@ -1,15 +1,37 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>代码预览器</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column}.header{background:#007acc;color:white;padding:10px;text-align:center}.container{display:flex;flex:1;overflow:hidden}.panel{flex:1;display:flex;flex-direction:column}.panel-header{background:#252526;padding:6px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:10px;font-family:Consolas,monospace;font-size:14px;resize:none;outline:none}#preview{flex:1;border:none;background:white}.button{background:#0e639c;color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;margin-left:3px;font-size:13px}.controls{padding:5px;background:#252526;border-top:1px solid #333;font-size:13px}.fullscreen{background:#d35400}.github{background:#28a745}#dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#252526;padding:15px;border-radius:5px;box-shadow:0 5px 20px rgba(0,0,0,0.5);z-index:1000;display:none;width:350px}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999;display:none}.file-status{margin:8px 0;padding:5px;background:#1a1a1a;border-radius:3px;font-size:12px}</style></head><body>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>代码预览器</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column}.header{background:#007acc;color:white;padding:10px;text-align:center}.container{display:flex;flex:1;overflow:hidden}.sidebar{width:40px;background:#252526;border-right:1px solid #333;display:flex;flex-direction:column;align-items:center;padding-top:10px}.icon-btn{width:30px;height:30px;margin-bottom:8px;background:#333;border:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}.icon-btn:hover{background:#444}.github-btn{background:#171515;color:white}.deepseek-btn{background:#0066CC;color:white}.search-btn{background:#4285f4;color:white}.panel{flex:1;display:flex;flex-direction:column;overflow:hidden}.panel-header{background:#252526;padding:6px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}.editor-container{display:flex;flex:1;overflow:auto}.line-numbers{background:#252526;color:#858585;padding:10px 5px;font:14px Consolas,monospace;text-align:right;min-width:40px;overflow:hidden;user-select:none;flex-shrink:0;height:fit-content;box-sizing:border-box}.line-numbers div{line-height:21px;min-height:21px}.code-textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:10px;font:14px Consolas,monospace;resize:none;outline:none;line-height:21px;min-height:100%}.editor-iframe{flex:1;border:none;background:white;display:none}#preview{flex:1;border:none;background:white}.button{background:#0e639c;color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;margin-left:3px;font-size:13px}.fullscreen{background:#d35400}.github{background:#28a745}.controls{padding:5px;background:#252526;border-top:1px solid #333;font-size:13px}#dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#252526;padding:15px;border-radius:5px;box-shadow:0 5px 20px rgba(0,0,0,0.5);z-index:1000;display:none;width:350px}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999;display:none}.file-status{margin:8px 0;padding:5px;background:#1a1a1a;border-radius:3px;font-size:12px}</style></head><body>
 <div class="header"><h2 style="font-size:1.2rem;margin:0">代码预览器</h2><p style="margin:3px 0;font-size:0.8rem">编辑代码，实时预览</p></div>
 <div class="container">
-<div class="panel"><div class="panel-header"><span>编辑器</span><select id="type" style="background:#1e1e1e;color:#d4d4d4;border:1px solid #444;padding:3px;font-size:12px"><option value="html">HTML</option><option value="css">CSS</option><option value="js">JS</option><option value="full">完整</option></select></div>
-<textarea id="code"><!DOCTYPE html>
+<div class="sidebar">
+<button class="icon-btn" title="文件模式" onclick="toggleMode('file')">📄</button>
+<button class="icon-btn github-btn" title="GitHub" onclick="toggleMode('github')">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+</button>
+<button class="icon-btn deepseek-btn" title="DeepSeek" onclick="toggleMode('deepseek')">
+<img src="https://www.deepseek.com/favicon.ico" alt="DeepSeek" width="16" height="16" style="display:block">
+</button>
+<button class="icon-btn search-btn" title="搜索" onclick="toggleMode('search')">
+🔍
+</button>
+</div>
+<div class="panel" id="editorPanel">
+<div class="panel-header">
+<span>编辑器</span>
+<select id="type" style="background:#1e1e1e;color:#d4d4d4;border:1px solid #444;padding:3px;font-size:12px">
+<option value="html">HTML</option><option value="css">CSS</option><option value="js">JS</option><option value="full">完整</option>
+</select>
+</div>
+<div class="editor-container">
+<div class="line-numbers" id="lineNumbers"><div>1</div></div>
+<textarea id="code" class="code-textarea" spellcheck="false"><!DOCTYPE html>
 <html>
 <body>
 <h1>测试</h1>
 </body>
 </html></textarea>
+<iframe class="editor-iframe" id="editorIframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" referrerpolicy="no-referrer"></iframe>
 </div>
-<div class="panel"><div class="panel-header"><span>预览</span><div><button class="button" onclick="R()">运行</button><button class="button" onclick="E()">示例</button><button class="button fullscreen" onclick="F()">全屏</button><button class="button github" onclick="D()">提交</button></div></div>
+</div>
+<div class="panel" id="previewPanel"><div class="panel-header"><span>预览</span><div><button class="button" onclick="R()">运行</button><button class="button" onclick="E()">示例</button><button class="button fullscreen" onclick="F()">全屏</button><button class="button github" onclick="D()">提交</button></div></div>
 <iframe id="preview"></iframe></div></div>
 <div class="controls"><label><input type="checkbox" id="auto" checked style="margin-right:3px">自动刷新</label><span id="status" style="margin-left:5px">就绪</span></div>
 <div class="overlay" onclick="H()"></div>
@@ -25,7 +47,88 @@
 </div>
 </div>
 <script>
-let sha=null,checking=false;
+let sha=null,checking=false,currentMode='file';
+const searchSites=[
+    {name:'百度',url:'https://www.baidu.com',color:'#2932e1'},
+    {name:'Google',url:'https://www.google.com',color:'#4285f4'}
+];
+let currentSearchIndex=0;
+
+// 更新行号
+function updateLineNumbers(){
+    const textarea=document.getElementById('code');
+    const lineNumbers=document.getElementById('lineNumbers');
+    const lines=textarea.value.split('\n');
+    
+    lineNumbers.style.height=textarea.scrollHeight+'px';
+    
+    let numbersHTML='';
+    for(let i=1;i<=lines.length;i++){
+        numbersHTML+=`<div>${i}</div>`;
+    }
+    lineNumbers.innerHTML=numbersHTML;
+    
+    const lineHeight=21;
+    const textareaHeight=textarea.scrollHeight;
+    const expectedLines=Math.max(1,Math.ceil(textareaHeight/lineHeight));
+    if(lines.length<expectedLines){
+        for(let i=lines.length+1;i<=expectedLines;i++){
+            numbersHTML+=`<div>${i}</div>`;
+        }
+        lineNumbers.innerHTML=numbersHTML;
+    }
+}
+
+// 同步滚动
+function syncScroll(){
+    const textarea=document.getElementById('code');
+    const lineNumbers=document.getElementById('lineNumbers');
+    lineNumbers.scrollTop=textarea.scrollTop;
+}
+
+// 切换模式
+function toggleMode(mode){
+    const code=document.getElementById('code');
+    const lineNumbers=document.getElementById('lineNumbers');
+    const iframe=document.getElementById('editorIframe');
+    const searchBtn=document.querySelector('.search-btn');
+    
+    currentMode=mode;
+    
+    if(mode==='file'){
+        code.style.display='block';
+        lineNumbers.style.display='flex';
+        iframe.style.display='none';
+        lineNumbers.style.flexDirection='column';
+        searchBtn.textContent='🔍';
+    }else if(mode==='search'){
+        // 循环切换搜索引擎
+        currentSearchIndex=(currentSearchIndex+1)%searchSites.length;
+        const site=searchSites[currentSearchIndex];
+        searchBtn.textContent=site.name==='百度'?'百':'G';
+        searchBtn.title=site.name;
+        searchBtn.style.background=site.color;
+        
+        code.style.display='none';
+        lineNumbers.style.display='none';
+        iframe.style.display='block';
+        iframe.src=site.url;
+    }else{
+        code.style.display='none';
+        lineNumbers.style.display='none';
+        iframe.style.display='block';
+        searchBtn.textContent='🔍';
+        searchBtn.style.background='#4285f4';
+        
+        if(mode==='github'){
+            // 使用GitHub的嵌入式页面
+            iframe.src='https://github1s.com';
+        }else if(mode==='deepseek'){
+            // 使用DeepSeek官方文档页面
+            iframe.src='https://platform.deepseek.com/api-docs/';
+        }
+    }
+}
 
 // 基本功能
 function R(){
@@ -43,6 +146,7 @@ function E(){
     if(t==='css')e='body{background:#f0f0f0}';
     else if(t==='js')e='console.log("示例");';
     document.getElementById('code').value=e;
+    updateLineNumbers();
     R();
 }
 
@@ -64,7 +168,7 @@ function D(){
     let t=localStorage.getItem('token');
     if(t){
         document.getElementById('token').value=t;
-        C();
+      C();
     }
 }
 
@@ -74,7 +178,7 @@ function H(){
     sha=null;
 }
 
-// 修复：检查文件逻辑
+// 检查文件逻辑
 async function C(){
     if(checking) return;
     checking=true;
@@ -90,7 +194,6 @@ async function C(){
         return;
     }
     
-    // 验证令牌格式
     if(!t.startsWith('ghp_')&&!t.startsWith('github_pat_')){
         s.textContent='令牌格式错误';
         sha=null;
@@ -147,7 +250,6 @@ async function S(){
             branch:'main'
         };
         
-        // 关键修复：只有确定有sha时才添加
         if(sha!==null){
             p.sha=sha;
         }
@@ -179,16 +281,46 @@ async function S(){
     }
 }
 
+// 防止iframe内部跳转
+document.getElementById('editorIframe').addEventListener('load', function() {
+    try {
+        const iframeWindow = this.contentWindow;
+        iframeWindow.onbeforeunload = function() {
+            return false;
+        };
+        
+        iframeWindow.document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A') {
+                e.preventDefault();
+                const url = e.target.href;
+                document.getElementById('editorIframe').src = url;
+            }
+        });
+    } catch(e) {
+        // 跨域限制，忽略
+    }
+});
+
 // 事件
 document.getElementById('code').addEventListener('input',function(){
+    updateLineNumbers();
     if(document.getElementById('auto').checked){
         clearTimeout(window.T);
         window.T=setTimeout(R,500);
     }
 });
 
+document.getElementById('code').addEventListener('scroll',syncScroll);
 document.getElementById('type').addEventListener('change',R);
-window.addEventListener('load',R);
+
+// 初始化
+window.addEventListener('load',function(){
+    updateLineNumbers();
+    R();
+    toggleMode('file');
+});
+
+document.getElementById('code').addEventListener('focus',updateLineNumbers);
 </script>
 </body>
 </html>
