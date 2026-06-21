@@ -1,326 +1,1417 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>代码预览器</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column}.header{background:#007acc;color:white;padding:10px;text-align:center}.container{display:flex;flex:1;overflow:hidden}.sidebar{width:40px;background:#252526;border-right:1px solid #333;display:flex;flex-direction:column;align-items:center;padding-top:10px}.icon-btn{width:30px;height:30px;margin-bottom:8px;background:#333;border:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}.icon-btn:hover{background:#444}.github-btn{background:#171515;color:white}.deepseek-btn{background:#0066CC;color:white}.search-btn{background:#4285f4;color:white}.panel{flex:1;display:flex;flex-direction:column;overflow:hidden}.panel-header{background:#252526;padding:6px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}.editor-container{display:flex;flex:1;overflow:auto}.line-numbers{background:#252526;color:#858585;padding:10px 5px;font:14px Consolas,monospace;text-align:right;min-width:40px;overflow:hidden;user-select:none;flex-shrink:0;height:fit-content;box-sizing:border-box}.line-numbers div{line-height:21px;min-height:21px}.code-textarea{flex:1;background:#1e1e1e;color:#d4d4d4;border:none;padding:10px;font:14px Consolas,monospace;resize:none;outline:none;line-height:21px;min-height:100%}.editor-iframe{flex:1;border:none;background:white;display:none}#preview{flex:1;border:none;background:white}.button{background:#0e639c;color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;margin-left:3px;font-size:13px}.fullscreen{background:#d35400}.github{background:#28a745}.controls{padding:5px;background:#252526;border-top:1px solid #333;font-size:13px}#dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#252526;padding:15px;border-radius:5px;box-shadow:0 5px 20px rgba(0,0,0,0.5);z-index:1000;display:none;width:350px}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999;display:none}.file-status{margin:8px 0;padding:5px;background:#1a1a1a;border-radius:3px;font-size:12px}</style></head><body>
-<div class="header"><h2 style="font-size:1.2rem;margin:0">代码预览器</h2><p style="margin:3px 0;font-size:0.8rem">编辑代码，实时预览</p></div>
-<div class="container">
-<div class="sidebar">
-<button class="icon-btn" title="文件模式" onclick="toggleMode('file')">📄</button>
-<button class="icon-btn github-btn" title="GitHub" onclick="toggleMode('github')">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-</button>
-<button class="icon-btn deepseek-btn" title="DeepSeek" onclick="toggleMode('deepseek')">
-<img src="https://www.deepseek.com/favicon.ico" alt="DeepSeek" width="16" height="16" style="display:block">
-</button>
-<button class="icon-btn search-btn" title="搜索" onclick="toggleMode('search')">
-🔍
-</button>
-</div>
-<div class="panel" id="editorPanel">
-<div class="panel-header">
-<span>编辑器</span>
-<select id="type" style="background:#1e1e1e;color:#d4d4d4;border:1px solid #444;padding:3px;font-size:12px">
-<option value="html">HTML</option><option value="css">CSS</option><option value="js">JS</option><option value="full">完整</option>
-</select>
-</div>
-<div class="editor-container">
-<div class="line-numbers" id="lineNumbers"><div>1</div></div>
-<textarea id="code" class="code-textarea" spellcheck="false"><!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeLab · 代码实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#0a0a1e;
+  --bg-1:#12122a;
+  --bg-2:#1a1a38;
+  --bg-3:#242448;
+  --line:#2e2e54;
+  --line-hi:#3d3d70;
+  --text:#e4e4ff;
+  --text-dim:#8a8ab5;
+  --text-mute:#5a5a85;
+  --accent:#4cc9f0;
+  --accent-2:#f72585;
+  --accent-3:#ffd166;
+  --ok:#4ade80;
+  --warn:#fbbf24;
+  --err:#f87171;
+  --shadow-glow: 0 0 0 1px rgba(76,201,240,0.2), 0 10px 40px rgba(76,201,240,0.15);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Noto Sans SC','Segoe UI',sans-serif;
+  background: var(--bg-0);
+  color:var(--text);
+  position:relative;
+  display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+  font-size:14px;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(76,201,240,0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 90% 100%, rgba(247,37,133,0.10) 0%, transparent 45%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1));
+}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  height:52px;flex-shrink:0;
+  display:flex;align-items:center;
+  padding:0 16px;gap:16px;
+  background:linear-gradient(180deg, rgba(18,18,42,0.95), rgba(18,18,42,0.8));
+  border-bottom:1px solid var(--line);
+  backdrop-filter: blur(10px);
+  z-index:10;
+}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Audiowide',monospace;font-size:13px;color:#fff;
+  box-shadow:0 0 20px rgba(76,201,240,0.35);
+  flex-shrink:0;
+}
+.brand-txt{display:flex;flex-direction:column;line-height:1.1;min-width:0}
+.brand-name{
+  font-family:'Audiowide',monospace;font-size:13px;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--accent),#fff,var(--accent-2));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  background-size:200% auto;animation:shine 5s linear infinite;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+@keyframes shine{to{background-position:200% center}}
+.brand-sub{font-size:11px;color:var(--text-mute);letter-spacing:1px;margin-top:2px}
+
+.divider{width:1px;height:22px;background:var(--line);margin:0 2px}
+
+/* Toolbar groups */
+.tb-group{display:flex;align-items:center;gap:4px}
+.tb-group.spacer{flex:1}
+
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  height:34px;padding:0 12px;border-radius:8px;
+  background:var(--bg-2);color:var(--text);
+  border:1px solid var(--line);cursor:pointer;
+  font-family:inherit;font-size:12px;font-weight:500;
+  transition:all .18s;white-space:nowrap;
+}
+.btn:hover{
+  background:var(--bg-3);border-color:var(--line-hi);
+  transform:translateY(-1px);
+}
+.btn:active{transform:translateY(0)}
+.btn i{font-size:11px;width:12px;text-align:center}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),#7bf1ff);
+  color:#0a0a1e;border-color:transparent;font-weight:700;
+  box-shadow:0 4px 16px rgba(76,201,240,0.3);
+}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(76,201,240,0.45)}
+
+.btn-accent{
+  background:linear-gradient(135deg,var(--accent-2),#ff6b9a);
+  color:#fff;border-color:transparent;font-weight:700;
+  box-shadow:0 4px 16px rgba(247,37,133,0.3);
+}
+.btn-accent:hover{box-shadow:0 6px 24px rgba(247,37,133,0.45)}
+
+.btn-ghost{background:transparent}
+.btn-ghost:hover{background:var(--bg-2)}
+
+/* Status pill */
+.status-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:999px;
+  background:var(--bg-2);border:1px solid var(--line);
+  font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;
+}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.status-pill.error .status-dot{background:var(--err);box-shadow:0 0 8px var(--err)}
+.status-pill.running .status-dot{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+/* Mode switcher pill tabs */
+.mode-tabs{display:flex;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.mode-tab{
+  padding:5px 11px;border-radius:7px;cursor:pointer;
+  font-size:11px;color:var(--text-dim);font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:all .15s;user-select:none;
+}
+.mode-tab i{font-size:11px}
+.mode-tab:hover{color:var(--text)}
+.mode-tab.active{
+  background:linear-gradient(135deg,var(--accent),#7bf1ff);
+  color:#0a0a1e;box-shadow:0 2px 10px rgba(76,201,240,0.3);
+}
+
+/* ============ MAIN LAYOUT ============ */
+.main{
+  flex:1;display:flex;overflow:hidden;position:relative;
+  padding:12px;gap:12px;
+}
+
+/* Left rail */
+.rail{
+  width:54px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:12px 0;
+  background:var(--bg-1);border:1px solid var(--line);
+  border-radius:14px;
+}
+.rail-btn{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--bg-2);border:1px solid var(--line);
+  color:var(--text-dim);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .18s;
+}
+.rail-btn:hover{background:var(--bg-3);color:var(--text);border-color:var(--line-hi);transform:translateY(-1px)}
+.rail-btn.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;border-color:transparent;
+  box-shadow:0 6px 18px rgba(76,201,240,0.3);
+}
+.rail-btn small{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.rail-spacer{flex:1}
+.rail-divider{width:22px;height:1px;background:var(--line)}
+
+/* Panels wrapper */
+.panels{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panels.horizontal{flex-direction:row}
+
+/* Panel */
+.panel{
+  flex:1;display:flex;flex-direction:column;
+  background:var(--bg-1);border:1px solid var(--line);
+  border-radius:14px;overflow:hidden;min-width:0;min-height:0;
+  transition:box-shadow .2s;
+}
+.panel:focus-within{box-shadow:var(--shadow-glow)}
+
+.panel-head{
+  height:42px;flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  padding:0 12px;
+  background:linear-gradient(180deg,var(--bg-2),var(--bg-1));
+  border-bottom:1px solid var(--line);
+}
+.panel-title{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:1px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;text-transform:uppercase;
+}
+.panel-title .ico{
+  width:22px;height:22px;border-radius:6px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;color:#fff;
+}
+.panel-title .ico.preview{background:linear-gradient(135deg,var(--accent-3),var(--accent-2))}
+.panel-title .ico.console{background:linear-gradient(135deg,#4ade80,var(--accent))}
+.panel-title .ico.browse{background:linear-gradient(135deg,#a78bfa,var(--accent-2))}
+
+.panel-tabs{display:flex;gap:4px;margin-left:8px}
+.ptab{
+  padding:6px 12px;font-size:11px;font-weight:600;
+  border-radius:7px 7px 0 0;cursor:pointer;
+  color:var(--text-mute);background:transparent;
+  border:1px solid transparent;border-bottom:none;
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono',monospace;
+  transition:all .15s;
+}
+.ptab:hover{color:var(--text);background:var(--bg-2)}
+.ptab.active{
+  background:var(--bg-0);color:var(--accent);
+  border-color:var(--line);border-bottom:1px solid var(--bg-0);
+}
+.ptab .ptab-dot{width:7px;height:7px;border-radius:2px;background:currentColor;opacity:.85}
+.ptab.html .ptab-dot{color:#ff8a65}
+.ptab.css .ptab-dot{color:#4cc9f0}
+.ptab.js .ptab-dot{color:#ffd166}
+
+.panel-head .right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.mini-btn{
+  width:28px;height:28px;border-radius:7px;
+  background:var(--bg-2);border:1px solid var(--line);
+  color:var(--text-dim);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;transition:all .15s;
+}
+.mini-btn:hover{background:var(--bg-3);color:var(--text);border-color:var(--line-hi)}
+.mini-btn.active{background:linear-gradient(135deg,var(--accent),#7bf1ff);color:#0a0a1e;border-color:transparent}
+
+/* Editor area */
+.editor-wrap{
+  flex:1;display:flex;position:relative;overflow:hidden;
+  background:var(--bg-0);
+}
+.line-numbers{
+  width:52px;flex-shrink:0;
+  padding:12px 8px 12px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--text-mute);text-align:right;
+  background:var(--bg-1);
+  border-right:1px solid var(--line);
+  overflow:hidden;user-select:none;
+  line-height:22px;
+  position:relative;
+}
+.line-numbers div{line-height:22px;height:22px}
+.line-numbers div.active{color:var(--accent);font-weight:600;background:linear-gradient(90deg,rgba(76,201,240,0.15),transparent);border-right:2px solid var(--accent)}
+
+.editor-scroll{flex:1;position:relative;overflow:auto}
+.code-textarea{
+  width:100%;min-width:100%;min-height:100%;
+  background:transparent;color:var(--text);
+  border:none;outline:none;resize:none;
+  padding:12px 16px;white-space:pre;
+  font-family:'JetBrains Mono',Consolas,monospace;
+  font-size:13.5px;line-height:22px;
+  caret-color:var(--accent);
+}
+.code-textarea::selection{background:rgba(76,201,240,0.25);color:#fff}
+
+/* Preview / browse */
+.preview-area{
+  flex:1;position:relative;background:#fff;
+  min-height:0;overflow:hidden;
+}
+.preview-area iframe{
+  width:100%;height:100%;border:none;display:block;
+}
+.preview-placeholder{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;color:#5a5a85;background:
+    radial-gradient(ellipse at center, #f5f5ff 0%, #e4e4ff 100%);
+}
+.preview-placeholder .big{
+  font-size:48px;
+  filter:drop-shadow(0 8px 24px rgba(76,201,240,0.4));
+}
+.preview-placeholder h3{font-family:'Audiowide',sans-serif;font-size:18px;color:#1a1a38;letter-spacing:3px}
+.preview-placeholder p{font-size:12px}
+.preview-placeholder.hidden{display:none}
+
+/* Console */
+.console-area{
+  flex:1;overflow-y:auto;padding:10px 14px;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;
+  background:var(--bg-0);
+}
+.console-row{
+  display:flex;gap:10px;padding:4px 0;
+  border-bottom:1px dashed rgba(255,255,255,0.04);
+  animation:fadeIn .3s ease-out;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.console-row:last-child{border-bottom:none}
+.console-ts{color:var(--text-mute);flex-shrink:0;width:70px;opacity:.7;font-size:11px;line-height:20px}
+.console-type{flex-shrink:0;width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px}
+.console-type.log{background:rgba(76,201,240,0.15);color:var(--accent)}
+.console-type.info{background:rgba(74,222,128,0.15);color:var(--ok)}
+.console-type.warn{background:rgba(251,191,36,0.15);color:var(--warn)}
+.console-type.error{background:rgba(248,113,113,0.15);color:var(--err)}
+.console-msg{flex:1;color:var(--text);word-break:break-word;white-space:pre-wrap}
+.console-empty{color:var(--text-mute);font-style:italic;display:flex;align-items:center;justify-content:center;height:100%;font-size:12px}
+.console-empty i{margin-right:8px;color:var(--accent)}
+
+/* Console input */
+.console-input-row{
+  height:38px;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;padding:0 12px;
+  background:var(--bg-2);border-top:1px solid var(--line);
+}
+.console-input-row .prompt{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;font-weight:700}
+.console-input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);
+  caret-color:var(--accent);
+}
+
+/* Bottom status bar */
+.statusbar{
+  height:28px;flex-shrink:0;
+  display:flex;align-items:center;gap:14px;
+  padding:0 16px;
+  background:var(--bg-1);border:1px solid var(--line);border-top:none;
+  border-radius:0 0 12px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-mute);
+  margin:-12px 12px 12px;
+  border-top:1px solid var(--line);
+}
+.sb-item{display:flex;align-items:center;gap:6px}
+.sb-item i{font-size:9px}
+.sb-item.hot{color:var(--accent)}
+.sb-spacer{flex:1}
+.sb-dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+
+/* Drag handle */
+.dragger{
+  flex-shrink:0;background:var(--line);
+  transition:background .15s;position:relative;cursor:col-resize;
+  border-radius:4px;
+}
+.dragger:hover,.dragger.active{background:var(--accent)}
+.dragger-v{width:6px;cursor:col-resize}
+.dragger-h{height:6px;cursor:row-resize}
+.dragger::before{
+  content:"";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:2px;height:20px;border-radius:2px;
+  background:rgba(255,255,255,0.15);
+}
+.dragger-h::before{width:20px;height:2px}
+
+/* ============ OVERLAY & DIALOGS ============ */
+.overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(10,10,30,0.6);backdrop-filter:blur(6px);
+  display:none;animation:fade .2s;
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.overlay.show{display:block}
+
+.dialog{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.95);
+  width:min(480px, 92vw);z-index:1100;
+  background:linear-gradient(180deg,var(--bg-1),var(--bg-0));
+  border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;display:none;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(76,201,240,0.1);
+}
+.dialog.show{display:block;animation:pop .3s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes pop{to{transform:translate(-50%,-50%) scale(1)}}
+
+.dialog-head{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 18px;border-bottom:1px solid var(--line);
+  background:linear-gradient(135deg, rgba(76,201,240,0.08), rgba(247,37,133,0.05));
+}
+.dialog-head .ico{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;
+  box-shadow:0 6px 18px rgba(76,201,240,0.3);
+}
+.dialog-head h3{font-size:15px;font-weight:700}
+.dialog-head p{font-size:11px;color:var(--text-dim);margin-top:2px;letter-spacing:.5px}
+.dialog-head .close{
+  margin-left:auto;width:30px;height:30px;border-radius:8px;
+  background:var(--bg-2);border:1px solid var(--line);
+  color:var(--text-dim);cursor:pointer;display:inline-flex;
+  align-items:center;justify-content:center;font-size:12px;
+  transition:all .15s;flex-shrink:0;
+}
+.dialog-head .close:hover{background:var(--bg-3);color:var(--text)}
+
+.dialog-body{padding:18px;display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.field input,.field textarea{
+  background:var(--bg-0);border:1px solid var(--line);
+  padding:10px 12px;border-radius:8px;color:var(--text);
+  font-family:inherit;font-size:13px;outline:none;
+  transition:all .15s;
+}
+.field input:focus,.field textarea:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(76,201,240,0.15);
+}
+.field textarea{resize:vertical;min-height:60px;font-family:'JetBrains Mono',monospace}
+
+.file-status{
+  padding:8px 12px;border-radius:8px;
+  background:var(--bg-0);border:1px dashed var(--line);
+  font-size:12px;color:var(--text-dim);
+  display:flex;align-items:center;gap:8px;
+}
+.file-status .fs-ico{width:22px;height:22px;border-radius:6px;background:var(--bg-2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent)}
+.file-status.ok{border-color:rgba(74,222,128,0.4);color:var(--ok)}
+.file-status.ok .fs-ico{background:rgba(74,222,128,0.15);color:var(--ok)}
+.file-status.new{border-color:rgba(76,201,240,0.4);color:var(--accent)}
+.file-status.new .fs-ico{background:rgba(76,201,240,0.15);color:var(--accent)}
+.file-status.err{border-color:rgba(248,113,113,0.4);color:var(--err)}
+.file-status.err .fs-ico{background:rgba(248,113,113,0.15);color:var(--err)}
+
+.dialog-foot{
+  display:flex;justify-content:flex-end;gap:10px;
+  padding:14px 18px;border-top:1px solid var(--line);
+  background:var(--bg-0);
+}
+
+/* Toast */
+.toast{
+  position:fixed;top:80px;right:24px;z-index:2000;
+  display:flex;flex-direction:column;gap:10px;
+}
+.toast-item{
+  padding:12px 16px;border-radius:10px;
+  background:linear-gradient(135deg,var(--bg-1),var(--bg-2));
+  border:1px solid var(--line);color:var(--text);
+  font-size:12.5px;font-weight:500;
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);
+  display:flex;align-items:center;gap:10px;
+  animation:slideIn .3s cubic-bezier(.2,.8,.2,1);
+  min-width:220px;max-width:340px;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.toast-item i{font-size:14px}
+.toast-item.ok{border-left:3px solid var(--ok)}
+.toast-item.ok i{color:var(--ok)}
+.toast-item.err{border-left:3px solid var(--err)}
+.toast-item.err i{color:var(--err)}
+.toast-item.info{border-left:3px solid var(--accent)}
+.toast-item.info i{color:var(--accent)}
+
+/* Search URL bar in browse mode */
+.browse-bar{
+  height:40px;flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  padding:0 10px;background:var(--bg-2);border-bottom:1px solid var(--line);
+}
+.browse-bar input{
+  flex:1;padding:6px 12px;border-radius:20px;
+  background:var(--bg-0);border:1px solid var(--line);
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;
+  transition:border-color .15s;
+}
+.browse-bar input:focus{border-color:var(--accent)}
+.browse-btns{display:flex;gap:4px}
+
+/* Responsive */
+@media (max-width: 860px){
+  .main{padding:8px;gap:8px;flex-direction:column}
+  .panels.horizontal{flex-direction:column}
+  .rail{width:100%;flex-direction:row;overflow-x:auto;justify-content:center;padding:8px}
+  .rail-spacer,.rail-divider{display:none}
+  .topbar{flex-wrap:wrap;height:auto;padding:10px 12px;gap:8px}
+  .tb-group.hide-sm{display:none}
+  .mode-tabs{overflow-x:auto}
+  .btn{padding:0 10px;height:30px}
+  .btn span.label{display:none}
+  .brand-sub{display:none}
+  .statusbar{margin:-8px 8px 8px;font-size:10px;overflow-x:auto;white-space:nowrap}
+  .line-numbers{width:40px;font-size:11px;padding-left:8px}
+  .code-textarea{font-size:12.5px}
+  .ptab{padding:4px 8px}
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:10px;border:2px solid var(--bg-0)}
+::-webkit-scrollbar-thumb:hover{background:var(--line-hi)}
+
+/* Flash highlight */
+@keyframes flashLine{
+  0%{background:rgba(76,201,240,0.2)}
+  100%{background:transparent}
+}
+</style>
+</head>
 <body>
-<h1>测试</h1>
-</body>
-</html></textarea>
-<iframe class="editor-iframe" id="editorIframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" referrerpolicy="no-referrer"></iframe>
+
+<!-- =============== TOP BAR =============== -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">&lt;/&gt;</div>
+    <div class="brand-txt">
+      <span class="brand-name">CODELAB</span>
+      <span class="brand-sub">代码实验室 · v2.0</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="mode-tabs" id="mainTabs">
+    <div class="mode-tab active" data-mode="edit"><i class="fas fa-code"></i><span>编辑</span></div>
+    <div class="mode-tab" data-mode="github"><i class="fab fa-github"></i><span>GitHub</span></div>
+    <div class="mode-tab" data-mode="deepseek"><i class="fas fa-robot"></i><span>DeepSeek</span></div>
+    <div class="mode-tab" data-mode="search"><i class="fas fa-search"></i><span>搜索</span></div>
+  </div>
+
+  <div class="tb-group spacer"></div>
+
+  <div class="tb-group hide-sm">
+    <div class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">就绪</span></div>
+  </div>
+
+  <div class="tb-group">
+    <button class="btn" onclick="clearAll()" title="清空"><i class="fas fa-eraser"></i><span class="label">清空</span></button>
+    <button class="btn" onclick="E()" title="示例"><i class="fas fa-wand-magic-sparkles"></i><span class="label">示例</span></button>
+    <button class="btn" onclick="toggleConsole()" title="控制台"><i class="fas fa-terminal"></i><span class="label">控制台</span></button>
+    <button class="btn-primary btn" onclick="R()" title="运行 (Ctrl+Enter)"><i class="fas fa-play"></i><span class="label">运行</span></button>
+    <button class="btn-accent btn" onclick="D()" title="提交到 GitHub"><i class="fab fa-github"></i><span class="label">提交</span></button>
+  </div>
 </div>
+
+<!-- =============== MAIN =============== -->
+<div class="main">
+
+  <!-- Left rail: file type quick switcher + extras -->
+  <div class="rail" id="rail">
+    <div class="rail-btn active" data-type="html" title="HTML"><small>HTML</small></div>
+    <div class="rail-btn" data-type="css" title="CSS"><small>CSS</small></div>
+    <div class="rail-btn" data-type="js" title="JS"><small>JS</small></div>
+    <div class="rail-btn" data-type="full" title="完整页面"><small>ALL</small></div>
+    <div class="rail-divider"></div>
+    <div class="rail-btn" onclick="downloadCode()" title="下载文件"><i class="fas fa-download"></i></div>
+    <div class="rail-btn" onclick="copyCode()" title="复制代码"><i class="fas fa-copy"></i></div>
+    <div class="rail-btn" onclick="F()" title="全屏预览"><i class="fas fa-expand"></i></div>
+    <div class="rail-spacer"></div>
+    <div class="rail-btn" onclick="goHome()" title="返回首页"><i class="fas fa-house"></i></div>
+  </div>
+
+  <!-- Panels -->
+  <div class="panels horizontal" id="panels">
+
+    <!-- LEFT PANEL (editor or browse) -->
+    <div class="panel" id="leftPanel" style="flex:1 1 50%">
+      <!-- Editor header -->
+      <div class="panel-head" id="editorHead">
+        <div class="panel-title"><span class="ico"><i class="fas fa-code"></i></span><span>SOURCE</span></div>
+        <div class="panel-tabs" id="editorTabs">
+          <div class="ptab html active" data-tab="html"><span class="ptab-dot"></span>index.html</div>
+          <div class="ptab css" data-tab="css"><span class="ptab-dot"></span>style.css</div>
+          <div class="ptab js" data-tab="js"><span class="ptab-dot"></span>script.js</div>
+          <div class="ptab" data-tab="full"><span class="ptab-dot"></span>full.html</div>
+        </div>
+        <div class="right">
+          <div class="status-pill" id="autoPill"><span class="status-dot" id="autoDot"></span><span id="autoText">自动刷新</span></div>
+          <button class="mini-btn" id="autoBtn" onclick="toggleAuto()" title="切换自动刷新"><i class="fas fa-rotate"></i></button>
+        </div>
+      </div>
+      <!-- Browse header (hidden initially) -->
+      <div class="panel-head" id="browseHead" style="display:none">
+        <div class="panel-title"><span class="ico browse"><i class="fas fa-globe"></i></span><span id="browseTitle">BROWSER</span></div>
+        <div class="browse-btns">
+          <button class="mini-btn" onclick="iframeBack()" title="后退"><i class="fas fa-arrow-left"></i></button>
+          <button class="mini-btn" onclick="iframeReload()" title="刷新"><i class="fas fa-rotate"></i></button>
+        </div>
+        <div class="right" style="flex:1;display:flex">
+          <div class="browse-bar" style="flex:1;height:30px;padding:0;border:none;background:transparent">
+            <input id="browseUrl" type="text" placeholder="输入网址..." onkeydown="if(event.key==='Enter') loadBrowse()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Editor content -->
+      <div class="editor-wrap" id="editorContent">
+        <div class="line-numbers" id="lineNumbers"></div>
+        <div class="editor-scroll">
+          <textarea id="code" class="code-textarea" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+      <!-- Browse content -->
+      <div class="preview-area" id="browseContent" style="display:none">
+        <iframe id="editorIframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-pointer-lock" referrerpolicy="no-referrer"></iframe>
+      </div>
+    </div>
+
+    <!-- Dragger between panels -->
+    <div class="dragger dragger-v" id="dragH"></div>
+
+    <!-- RIGHT PANEL: preview + console stack -->
+    <div class="panel" id="rightPanel" style="flex:1 1 50%;display:flex;flex-direction:column">
+      <div class="panel-head">
+        <div class="panel-title"><span class="ico preview"><i class="fas fa-play"></i></span><span>PREVIEW</span></div>
+        <div class="right">
+          <div class="status-pill" id="previewStatus"><span class="status-dot"></span><span id="previewStatusText">实时</span></div>
+          <button class="mini-btn" onclick="R()" title="刷新预览"><i class="fas fa-rotate"></i></button>
+          <button class="mini-btn" onclick="F()" title="全屏"><i class="fas fa-expand"></i></button>
+        </div>
+      </div>
+      <div class="preview-area">
+        <div class="preview-placeholder" id="previewPlaceholder">
+          <div class="big">🎨</div>
+          <h3>LIVE PREVIEW</h3>
+          <p>点击「运行」或编辑代码以查看实时预览</p>
+        </div>
+        <iframe id="preview" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" referrerpolicy="no-referrer"></iframe>
+      </div>
+
+      <!-- Console section -->
+      <div style="display:flex;flex-direction:column;height:35%;border-top:1px solid var(--line);flex-shrink:0" id="consoleBlock">
+        <div class="panel-head" style="height:34px">
+          <div class="panel-title"><span class="ico console"><i class="fas fa-terminal"></i></span><span>CONSOLE</span></div>
+          <div class="right">
+            <div class="status-pill" style="padding:3px 9px;font-size:10px"><span class="status-dot" id="consoleCountDot"></span><span id="consoleCount">0</span></div>
+            <button class="mini-btn" onclick="clearConsole()" title="清空控制台"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+        <div class="console-area" id="consoleArea">
+          <div class="console-empty" id="consoleEmpty"><i class="fas fa-terminal"></i>暂无输出 · 运行代码或在下方输入 JavaScript 指令</div>
+        </div>
+        <div class="console-input-row">
+          <span class="prompt">&gt;</span>
+          <input type="text" id="consoleInput" class="console-input" placeholder="输入 JavaScript 后回车执行..." onkeydown="handleConsoleInput(event)">
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="panel" id="previewPanel"><div class="panel-header"><span>预览</span><div><button class="button" onclick="R()">运行</button><button class="button" onclick="E()">示例</button><button class="button fullscreen" onclick="F()">全屏</button><button class="button github" onclick="D()">提交</button></div></div>
-<iframe id="preview"></iframe></div></div>
-<div class="controls"><label><input type="checkbox" id="auto" checked style="margin-right:3px">自动刷新</label><span id="status" style="margin-left:5px">就绪</span></div>
-<div class="overlay" onclick="H()"></div>
-<div id="dialog">
-<div style="display:flex;justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;font-size:1rem">提交到GitHub</h3><span onclick="H()" style="cursor:pointer">×</span></div>
-<input id="file" placeholder="文件名" oninput="C()" style="width:100%;padding:6px;margin-bottom:6px;background:#1e1e1e;border:1px solid #444;color:#d4d4d4;border-radius:3px">
-<textarea id="msg" placeholder="说明" rows="2" style="width:100%;padding:6px;margin-bottom:6px;background:#1e1e1e;border:1px solid #444;color:#d4d4d4;border-radius:4px">代码预览器提交</textarea>
-<input id="token" placeholder="GitHub令牌" oninput="C()" style="width:100%;padding:6px;margin-bottom:6px;background:#1e1e1e;border:1px solid #444;color:#d4d4d4;border-radius:3px">
-<div id="fs" class="file-status">等待输入</div>
-<div style="text-align:right;margin-top:8px">
-<button class="button" onclick="H()" style="background:#666;margin-right:4px">取消</button>
-<button class="button github" onclick="S()">提交</button>
+
+<!-- Status bar at bottom -->
+<div class="statusbar">
+  <div class="sb-item hot"><i class="fas fa-code"></i><span id="sbType">HTML</span></div>
+  <div class="sb-item"><i class="fas fa-hashtag"></i>行 <span id="sbLines">0</span></div>
+  <div class="sb-item"><i class="fas fa-font"></i>字符 <span id="sbChars">0</span></div>
+  <div class="sb-item"><i class="fas fa-location-crosshairs"></i>光标 <span id="sbPos">1:1</span></div>
+  <div class="sb-spacer"></div>
+  <div class="sb-item"><i class="fas fa-moon"></i>深色模式</div>
+  <div class="sb-item"><i class="fas fa-keyboard"></i>Ctrl+Enter 运行</div>
+  <div class="sb-item"><span class="sb-dot"></span>UTF-8</div>
 </div>
+
+<!-- =============== OVERLAYS =============== -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<div class="dialog" id="dialog">
+  <div class="dialog-head">
+    <div class="ico"><i class="fab fa-github"></i></div>
+    <div>
+      <h3>提交到 GitHub</h3>
+      <p>将当前代码保存为文件（fsywed/fsywed.github.io）</p>
+    </div>
+    <button class="close" onclick="closeAll()">✕</button>
+  </div>
+  <div class="dialog-body">
+    <div class="field">
+      <label>文件名</label>
+      <input id="file" placeholder="例如: my-page.html" oninput="C()" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>提交说明</label>
+      <textarea id="msg" placeholder="更新描述（可选）" spellcheck="false">代码实验室提交 · CodeLab</textarea>
+    </div>
+    <div class="field">
+      <label>GitHub Token</label>
+      <input id="token" placeholder="ghp_xxxxxxxxxxxx" oninput="C()" type="password" spellcheck="false">
+    </div>
+    <div class="file-status" id="fs">
+      <span class="fs-ico"><i class="fas fa-circle-question"></i></span>
+      <span id="fsText">等待输入文件信息...</span>
+    </div>
+  </div>
+  <div class="dialog-foot">
+    <button class="btn btn-ghost" onclick="closeAll()">取消</button>
+    <button class="btn btn-primary" onclick="S()"><i class="fas fa-paper-plane"></i>提交</button>
+  </div>
 </div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-let sha=null,checking=false,currentMode='file';
-const searchSites=[
-    {name:'百度',url:'https://www.baidu.com',color:'#2932e1'},
-    {name:'Google',url:'https://www.google.com',color:'#4285f4'}
-];
-let currentSearchIndex=0;
+/* ======================================================
+   STATE
+   ====================================================== */
+const LS_KEY = 'codelab_v2';
+const defaults = {
+  html: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Hello CodeLab</title>
+</head>
+<body>
+<div class="hero">
+  <h1>✨ 欢迎来到 CodeLab</h1>
+  <p>编辑左侧代码，查看右侧实时预览效果</p>
+  <button onclick="greet()">点击试试 →</button>
+</div>
+</body>
+</html>`,
+  css: `* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0a0a1e, #312e81);
+  color: #fff; padding: 24px;
+}
+.hero { text-align: center; max-width: 520px; }
+.hero h1 {
+  font-size: 40px; margin-bottom: 16px;
+  background: linear-gradient(90deg, #4cc9f0, #f72585);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.hero p { opacity: .8; margin-bottom: 28px; font-size: 16px; line-height: 1.7; }
+.hero button {
+  background: linear-gradient(135deg, #4cc9f0, #f72585);
+  color: #fff; border: none; padding: 14px 28px;
+  font-size: 15px; font-weight: 700; border-radius: 999px;
+  cursor: pointer; transition: transform .2s;
+}
+.hero button:hover { transform: translateY(-2px) scale(1.03); }`,
+  js: `let count = 0;
+function greet(){
+  count++;
+  console.log('🎉 你好！这是第 ' + count + ' 次点击');
+  alert('✨ 你好！这是来自 CodeLab 的问候\\n\\n当前点击次数: ' + count);
+}
+console.log('✅ CodeLab 就绪');
+console.info('💡 你可以在下方控制台直接输入 JavaScript');
+console.warn('试试: console.log(\"Hello World\")');
+console.error('（示例）错误信息会以红色显示');`,
+  full: ''
+};
 
-// 更新行号
+let state = {
+  code: { ...defaults },
+  currentTab: 'html',
+  mode: 'edit',
+  autoRun: true,
+  runTimer: null
+};
+
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state.code)); }catch(_){}
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const obj = JSON.parse(raw);
+      for(const k of Object.keys(defaults)){
+        if(typeof obj[k] === 'string') state.code[k] = obj[k];
+      }
+    }
+  }catch(_){}
+}
+
+/* ======================================================
+   DOM refs
+   ====================================================== */
+const $code = document.getElementById('code');
+const $lineNumbers = document.getElementById('lineNumbers');
+const $statusText = document.getElementById('statusText');
+const $statusPill = document.getElementById('statusPill');
+const $autoText = document.getElementById('autoText');
+const $autoBtn = document.getElementById('autoBtn');
+const $preview = document.getElementById('preview');
+const $previewPlaceholder = document.getElementById('previewPlaceholder');
+const $previewStatusText = document.getElementById('previewStatusText');
+const $sbType = document.getElementById('sbType');
+const $sbLines = document.getElementById('sbLines');
+const $sbChars = document.getElementById('sbChars');
+const $sbPos = document.getElementById('sbPos');
+const $consoleArea = document.getElementById('consoleArea');
+const $consoleEmpty = document.getElementById('consoleEmpty');
+const $consoleInput = document.getElementById('consoleInput');
+const $consoleCount = document.getElementById('consoleCount');
+const $browseContent = document.getElementById('browseContent');
+const $editorContent = document.getElementById('editorContent');
+const $browseHead = document.getElementById('browseHead');
+const $editorHead = document.getElementById('editorHead');
+const $editorIframe = document.getElementById('editorIframe');
+const $browseTitle = document.getElementById('browseTitle');
+const $browseUrl = document.getElementById('browseUrl');
+
+/* ======================================================
+   Editor - tab switching
+   ====================================================== */
+function switchTab(tab){
+  state.currentTab = tab;
+  // Save current textarea into previous tab
+  document.querySelectorAll('.ptab').forEach(el=>{
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  // Update rail buttons
+  document.querySelectorAll('.rail-btn[data-type]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.type === tab);
+  });
+  // Load content
+  $code.value = state.code[tab] || '';
+  updateLineNumbers();
+  updateStatusbar();
+  setStatus('切换到 ' + tab.toUpperCase(), 'info');
+  $sbType.textContent = tab === 'full' ? 'FULL HTML' : tab.toUpperCase();
+  // Update placeholder for FULL tab
+  if(tab === 'full' && !$code.value.trim()){
+    $code.value = '<!-- 在这里编写完整的 HTML 页面 -->\n<!DOCTYPE html>\n<html>\n<head><title>Full</title></head>\n<body></body>\n</html>';
+  }
+  // for full tab, editor tabs should hide/keep — we keep them visible
+  // Highlight active tab type correctly
+}
+
+/* ======================================================
+   Line numbers
+   ====================================================== */
 function updateLineNumbers(){
-    const textarea=document.getElementById('code');
-    const lineNumbers=document.getElementById('lineNumbers');
-    const lines=textarea.value.split('\n');
-    
-    lineNumbers.style.height=textarea.scrollHeight+'px';
-    
-    let numbersHTML='';
-    for(let i=1;i<=lines.length;i++){
-        numbersHTML+=`<div>${i}</div>`;
-    }
-    lineNumbers.innerHTML=numbersHTML;
-    
-    const lineHeight=21;
-    const textareaHeight=textarea.scrollHeight;
-    const expectedLines=Math.max(1,Math.ceil(textareaHeight/lineHeight));
-    if(lines.length<expectedLines){
-        for(let i=lines.length+1;i<=expectedLines;i++){
-            numbersHTML+=`<div>${i}</div>`;
-        }
-        lineNumbers.innerHTML=numbersHTML;
-    }
+  const lines = $code.value.split('\n');
+  const n = Math.max(1, lines.length);
+  let html = '';
+  for(let i=1;i<=n;i++){
+    html += '<div data-line="'+i+'">'+i+'</div>';
+  }
+  $lineNumbers.innerHTML = html;
 }
 
-// 同步滚动
 function syncScroll(){
-    const textarea=document.getElementById('code');
-    const lineNumbers=document.getElementById('lineNumbers');
-    lineNumbers.scrollTop=textarea.scrollTop;
+  $lineNumbers.scrollTop = $code.scrollTop;
+  // Highlight current line (approximate by scroll + line height)
 }
 
-// 切换模式
-function toggleMode(mode){
-    const code=document.getElementById('code');
-    const lineNumbers=document.getElementById('lineNumbers');
-    const iframe=document.getElementById('editorIframe');
-    const searchBtn=document.querySelector('.search-btn');
-    
-    currentMode=mode;
-    
-    if(mode==='file'){
-        code.style.display='block';
-        lineNumbers.style.display='flex';
-        iframe.style.display='none';
-        lineNumbers.style.flexDirection='column';
-        searchBtn.textContent='🔍';
-    }else if(mode==='search'){
-        // 循环切换搜索引擎
-        currentSearchIndex=(currentSearchIndex+1)%searchSites.length;
-        const site=searchSites[currentSearchIndex];
-        searchBtn.textContent=site.name==='百度'?'百':'G';
-        searchBtn.title=site.name;
-        searchBtn.style.background=site.color;
-        
-        code.style.display='none';
-        lineNumbers.style.display='none';
-        iframe.style.display='block';
-        iframe.src=site.url;
-    }else{
-        code.style.display='none';
-        lineNumbers.style.display='none';
-        iframe.style.display='block';
-        searchBtn.textContent='🔍';
-        searchBtn.style.background='#4285f4';
-        
-        if(mode==='github'){
-            // 使用GitHub的嵌入式页面
-            iframe.src='https://github1s.com';
-        }else if(mode==='deepseek'){
-            // 使用DeepSeek官方文档页面
-            iframe.src='https://platform.deepseek.com/api-docs/';
-        }
-    }
+/* Cursor position */
+function updateCursorPos(){
+  const pos = $code.selectionStart;
+  const before = $code.value.substring(0, pos);
+  const lines = before.split('\n');
+  const row = lines.length;
+  const col = lines[lines.length - 1].length + 1;
+  $sbPos.textContent = row + ':' + col;
+  // Highlight line
+  const lh = 22;
+  const lineIdx = row;
+  document.querySelectorAll('.line-numbers div').forEach((el,idx)=>{
+    el.classList.toggle('active', idx+1 === lineIdx);
+  });
 }
 
-// 基本功能
-function R(){
-    let c=document.getElementById('code').value,t=document.getElementById('type').value,h='';
-    if(t==='full')h=c;
-    else if(t==='html')h='<!DOCTYPE html><html><head><style>body{padding:10px}</style></head><body>'+c+'</body></html>';
-    else if(t==='css')h='<!DOCTYPE html><html><head><style>'+c+'</style></head><body><div>CSS预览</div></body></html>';
-    else if(t==='js')h='<!DOCTYPE html><html><body><script>try{'+c+'}catch(e){console.error(e)}<\/script></body></html>';
-    document.getElementById('preview').srcdoc=h;
-    document.getElementById('status').textContent='已更新';
+function updateStatusbar(){
+  const val = $code.value;
+  $sbLines.textContent = val.split('\n').length;
+  $sbChars.textContent = val.length;
 }
 
-function E(){
-    let t=document.getElementById('type').value,e='<h2>示例</h2>';
-    if(t==='css')e='body{background:#f0f0f0}';
-    else if(t==='js')e='console.log("示例");';
-    document.getElementById('code').value=e;
+/* ======================================================
+   Code editing -> store to current tab
+   ====================================================== */
+$code.addEventListener('input', ()=>{
+  state.code[state.currentTab] = $code.value;
+  updateLineNumbers();
+  updateStatusbar();
+  updateCursorPos();
+  save();
+  if(state.autoRun){
+    clearTimeout(state.runTimer);
+    state.runTimer = setTimeout(R, 500);
+  }
+});
+$code.addEventListener('scroll', syncScroll);
+$code.addEventListener('click', updateCursorPos);
+$code.addEventListener('keyup', updateCursorPos);
+$code.addEventListener('keydown', (e)=>{
+  if(e.key === 'Tab'){
+    e.preventDefault();
+    const s = $code.selectionStart, ee = $code.selectionEnd;
+    $code.value = $code.value.substring(0,s) + '  ' + $code.value.substring(ee);
+    $code.selectionStart = $code.selectionEnd = s + 2;
+    state.code[state.currentTab] = $code.value;
     updateLineNumbers();
-    R();
+    save();
+  } else if((e.ctrlKey||e.metaKey) && e.key === 'Enter'){
+    e.preventDefault(); R();
+  } else if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 's'){
+    e.preventDefault(); save(); setStatus('已保存','ok');
+  }
+});
+
+/* ======================================================
+   Editor tabs click
+   ====================================================== */
+document.querySelectorAll('.ptab').forEach(tab=>{
+  tab.addEventListener('click', ()=> switchTab(tab.dataset.tab));
+});
+document.querySelectorAll('.rail-btn[data-type]').forEach(btn=>{
+  btn.addEventListener('click', ()=> switchTab(btn.dataset.type));
+});
+
+/* ======================================================
+   MAIN TABS (edit/github/deepseek/search)
+   ====================================================== */
+document.querySelectorAll('.mode-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    const m = tab.dataset.mode;
+    document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active', t===tab));
+    switchMode(m);
+  });
+});
+
+function switchMode(mode){
+  state.mode = mode;
+  if(mode === 'edit'){
+    $editorHead.style.display = 'flex';
+    $browseHead.style.display = 'none';
+    $editorContent.style.display = 'flex';
+    $browseContent.style.display = 'none';
+    $browseTitle.textContent = 'BROWSER';
+    setStatus('编辑模式', 'info');
+  } else {
+    $editorHead.style.display = 'none';
+    $browseHead.style.display = 'flex';
+    $editorContent.style.display = 'none';
+    $browseContent.style.display = 'flex';
+    if(mode === 'github'){
+      $browseTitle.textContent = 'GITHUB · 嵌入式浏览';
+      $browseUrl.value = 'https://github1s.com';
+      tryLoad('https://github1s.com');
+    } else if(mode === 'deepseek'){
+      $browseTitle.textContent = 'DEEPSEEK · AI 助手';
+      $browseUrl.value = 'https://chat.deepseek.com';
+      tryLoad('https://chat.deepseek.com');
+    } else if(mode === 'search'){
+      $browseTitle.textContent = 'SEARCH · 在线搜索';
+      $browseUrl.value = 'https://www.bing.com';
+      tryLoad('https://www.bing.com');
+    }
+  }
+}
+
+function tryLoad(url){
+  $editorIframe.src = url;
+  setStatus('加载 ' + url, 'info');
+}
+function loadBrowse(){
+  let url = $browseUrl.value.trim();
+  if(!url) return;
+  if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  tryLoad(url);
+}
+function iframeReload(){
+  $editorIframe.src = $editorIframe.src;
+}
+function iframeBack(){ history.length>1 && history.back(); }
+
+/* ======================================================
+   RUN / PREVIEW
+   ====================================================== */
+function buildDocument(){
+  const type = state.currentTab;
+  const html = state.code.html || '';
+  const css = state.code.css || '';
+  const js = state.code.js || '';
+  const full = state.code.full || '';
+
+  if(type === 'full'){
+    return full || buildFromParts(html, css, js);
+  }
+  if(type === 'html'){
+    return buildFromParts(html, css, js);
+  }
+  if(type === 'css'){
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${css}</style></head><body><div style="padding:30px;font-family:sans-serif"><h2 style="color:#4cc9f0">CSS 预览</h2><p>你的 CSS 已作用于当前页面。</p><button style="margin-top:20px">示例按钮</button></div></body></html>`;
+  }
+  if(type === 'js'){
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{background:#0a0a1e;color:#e4e4ff;font-family:sans-serif;padding:24px}</style></head><body><div><h2 style="color:#ffd166">JavaScript 预览</h2><p>代码已在 iframe 中执行，输出请查看右下方的控制台。</p></div><script>try{${js}}catch(e){window.parent.postMessage({type:'codelab_error',message:e&&e.message},'*')}<\/script></body></html>`;
+  }
+  return buildFromParts(html, css, js);
+}
+
+function buildFromParts(html, css, js){
+  // Extract <body>...</body> from html if present; otherwise wrap
+  let bodyInner = html.trim();
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  if(bodyMatch){ bodyInner = bodyMatch[1]; }
+  else {
+    // strip <!DOCTYPE><html><head> and </body></html> markers if any
+    bodyInner = html
+      .replace(/<!DOCTYPE[^>]*>/gi,'')
+      .replace(/<\/?html[^>]*>/gi,'')
+      .replace(/<\/?head[^>]*>/gi,'')
+      .replace(/<\/?body[^>]*>/gi,'');
+  }
+  let headExtra = '';
+  const headMatch = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  if(headMatch){ headExtra = headMatch[1]; }
+
+  const consoleHijack = `<script>
+(function(){
+  function send(t,args){
+    try{
+      parent.postMessage({type:'codelab_console',method:t,args:Array.prototype.slice.call(args).map(function(a){
+        try{ if(a instanceof Error) return 'Error: ' + a.message; if(typeof a==='object') return JSON.stringify(a,null,2); }catch(e){}
+        return String(a);
+      })},'*');
+    }catch(e){}
+  }
+  var l=console.log,i=console.info,w=console.warn,e=console.error;
+  console.log=function(){send('log',arguments);l.apply(console,arguments);};
+  console.info=function(){send('info',arguments);i.apply(console,arguments);};
+  console.warn=function(){send('warn',arguments);w.apply(console,arguments);};
+  console.error=function(){send('error',arguments);e.apply(console,arguments);};
+  window.addEventListener('error',function(ev){
+    send('error',[(ev.message||'Script error') + (ev.lineno ? ' (line '+ev.lineno+')' : '')]);
+  });
+  window.addEventListener('unhandledrejection',function(ev){
+    send('error',['Unhandled Promise rejection: ' + (ev.reason && ev.reason.message || ev.reason)]);
+  });
+})();
+<\/script>`;
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+${headExtra}
+${css ? `<style>${css}</style>` : ''}
+${consoleHijack}
+</head>
+<body>
+${bodyInner}
+${js ? `<script>${js}<\/script>` : ''}
+</body>
+</html>`;
+}
+
+function R(){
+  try{
+    const doc = buildDocument();
+    $preview.srcdoc = doc;
+    $previewPlaceholder.classList.add('hidden');
+    $previewStatusText.textContent = '已更新 · ' + new Date().toLocaleTimeString();
+    setStatus('✅ 运行成功', 'ok');
+    clearConsolePreviewErrors();
+  }catch(err){
+    setStatus('构建失败: ' + err.message, 'error');
+    logToConsole('error', '构建失败: ' + err.message);
+  }
+}
+
+function clearConsolePreviewErrors(){ /* marker */ }
+
+/* ======================================================
+   CONSOLE: capture messages from preview
+   ====================================================== */
+let consoleCount = 0;
+function logToConsole(type, msg){
+  if($consoleEmpty) $consoleEmpty.style.display = 'none';
+  const row = document.createElement('div');
+  row.className = 'console-row';
+  const now = new Date();
+  const ts = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+  row.innerHTML = `
+    <div class="console-ts">${ts}</div>
+    <div class="console-type ${type}">${type==='log'?'L':type==='info'?'I':type==='warn'?'W':'E'}</div>
+    <div class="console-msg"></div>
+  `;
+  row.querySelector('.console-msg').textContent = msg;
+  $consoleArea.appendChild(row);
+  $consoleArea.scrollTop = $consoleArea.scrollHeight;
+  consoleCount++;
+  $consoleCount.textContent = consoleCount;
+}
+
+function clearConsole(){
+  $consoleArea.innerHTML = '';
+  const el = document.createElement('div');
+  el.className = 'console-empty';
+  el.id = 'consoleEmpty';
+  el.innerHTML = '<i class="fas fa-terminal"></i>控制台已清空';
+  $consoleArea.appendChild(el);
+  consoleCount = 0; $consoleCount.textContent = '0';
+}
+
+window.addEventListener('message', (e)=>{
+  if(!e.data || typeof e.data !== 'object') return;
+  if(e.data.type === 'codelab_console'){
+    const msg = (e.data.args || []).join(' ');
+    logToConsole(e.data.method || 'log', msg);
+  } else if(e.data.type === 'codelab_error'){
+    logToConsole('error', e.data.message || '脚本错误');
+  }
+});
+
+function handleConsoleInput(e){
+  if(e.key !== 'Enter') return;
+  const val = $consoleInput.value.trim();
+  if(!val) return;
+  logToConsole('info', '> ' + val);
+  try {
+    // execute in preview window context by writing into iframe
+    const win = $preview.contentWindow;
+    const result = win.eval ? win.eval(val) : eval(val);
+    if(result !== undefined){
+      logToConsole('log', typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result));
+    }
+  } catch(err){
+    logToConsole('error', String(err && err.message || err));
+  }
+  $consoleInput.value = '';
+}
+
+/* ======================================================
+   STATUS / TOAST
+   ====================================================== */
+function setStatus(text, type){
+  $statusText.textContent = text;
+  $statusPill.classList.remove('error','running');
+  if(type === 'error') $statusPill.classList.add('error');
+  if(type === 'info') $statusPill.classList.add('running');
+  if(type === 'ok') {/* default green dot */}
+}
+
+function toast(text, type){
+  type = type || 'info';
+  const t = document.createElement('div');
+  t.className = 'toast-item ' + type;
+  const icons = {ok:'check-circle',err:'circle-exclamation',info:'info-circle'};
+  t.innerHTML = `<i class="fas fa-${icons[type]||'info-circle'}"></i><span>${text}</span>`;
+  document.getElementById('toast').appendChild(t);
+  setTimeout(()=>{ t.style.opacity=0; t.style.transform='translateX(30px)'; t.style.transition='.3s'; }, 2500);
+  setTimeout(()=>t.remove(), 2900);
+}
+
+/* ======================================================
+   AUTO RUN TOGGLE
+   ====================================================== */
+function toggleAuto(){
+  state.autoRun = !state.autoRun;
+  $autoText.textContent = state.autoRun ? '自动刷新' : '手动刷新';
+  $autoBtn.classList.toggle('active', state.autoRun);
+  setStatus(state.autoRun ? '已启用自动刷新' : '已切换为手动刷新', 'info');
+}
+
+/* ======================================================
+   EXAMPLES & UTILS
+   ====================================================== */
+function E(){
+  state.code.html = defaults.html;
+  state.code.css = defaults.css;
+  state.code.js = defaults.js;
+  switchTab(state.currentTab || 'html');
+  save();
+  R();
+  toast('已载入示例代码', 'ok');
+}
+
+function clearAll(){
+  if(!confirm('确认清空全部代码？此操作不可撤销。')) return;
+  state.code = { html:'', css:'', js:'', full:'' };
+  $code.value = '';
+  save();
+  updateLineNumbers();
+  updateStatusbar();
+  clearConsole();
+  toast('已清空', 'info');
+}
+
+function copyCode(){
+  const txt = state.code[state.currentTab] || '';
+  navigator.clipboard.writeText(txt).then(()=>{
+    toast('已复制 ' + state.currentTab.toUpperCase() + ' 到剪贴板','ok');
+  }).catch(()=>{
+    // fallback
+    $code.select(); document.execCommand('copy');
+    toast('已复制','ok');
+  });
+}
+
+function downloadCode(){
+  const map = { html:'index.html', css:'style.css', js:'script.js', full:'full-page.html' };
+  const filename = map[state.currentTab];
+  const content = state.code[state.currentTab] || '';
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('已下载 ' + filename, 'ok');
+}
+
+function toggleConsole(){
+  const cb = document.getElementById('consoleBlock');
+  if(!cb) return;
+  if(cb.style.display === 'none'){ cb.style.display='flex'; toast('显示控制台','info'); }
+  else { cb.style.display='none'; toast('隐藏控制台','info'); }
 }
 
 function F(){
-    let p=document.querySelector('.panel:last-child');
-    if(!document.fullscreenElement){
-        p.requestFullscreen?p.requestFullscreen():p.webkitRequestFullscreen?p.webkitRequestFullscreen():p.mozRequestFullScreen&&p.mozRequestFullScreen();
-        document.querySelector('.fullscreen').textContent='退出';
-    }else{
-        document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?document.webkitExitFullscreen():document.mozCancelFullScreen&&document.mozCancelFullScreen();
-        document.querySelector('.fullscreen').textContent='全屏';
-    }
+  const p = document.getElementById('rightPanel');
+  if(!document.fullscreenElement){
+    (p.requestFullscreen||p.webkitRequestFullscreen||p.mozRequestFullScreen).call(p).catch(()=>{});
+  } else {
+    (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+  }
 }
 
-// GitHub功能
+function goHome(){
+  if(confirm('返回首页？当前代码已保存到本地。')) window.location.href = 'index.html';
+}
+
+/* ======================================================
+   GITHUB SUBMIT
+   ====================================================== */
+let sha = null, checking = false;
 function D(){
-    document.getElementById('dialog').style.display='block';
-    document.querySelector('.overlay').style.display='block';
-    let t=localStorage.getItem('token');
-    if(t){
-        document.getElementById('token').value=t;
-      C();
-    }
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('dialog').classList.add('show');
+  const tok = localStorage.getItem('gh_token');
+  if(tok) document.getElementById('token').value = tok;
+  // default filename by active tab
+  const map = { html:'page.html', css:'style.css', js:'script.js', full:'full-page.html' };
+  const f = document.getElementById('file');
+  if(!f.value) f.value = map[state.currentTab] || 'page.html';
+  C();
+  setTimeout(()=>f.focus(), 150);
+}
+function closeAll(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('dialog').classList.remove('show');
+  sha=null;
+}
+function setFS(kind, text, icon){
+  const fs = document.getElementById('fs');
+  fs.className = 'file-status ' + (kind || '');
+  document.getElementById('fsText').textContent = text;
+  const ic = fs.querySelector('.fs-ico');
+  if(ic) ic.innerHTML = '<i class="fas fa-' + (icon || 'circle-question') + '"></i>';
 }
 
-function H(){
-    document.getElementById('dialog').style.display='none';
-    document.querySelector('.overlay').style.display='none';
-    sha=null;
-}
-
-// 检查文件逻辑
 async function C(){
-    if(checking) return;
-    checking=true;
-    
-    let f=document.getElementById('file').value.trim();
-    let t=document.getElementById('token').value.trim();
-    let s=document.getElementById('fs');
-    
-    if(!f||!t){
-        s.textContent='等待输入';
-        sha=null;
-        checking=false;
-        return;
+  if(checking) return;
+  checking = true;
+  const f = document.getElementById('file').value.trim();
+  const t = document.getElementById('token').value.trim();
+  if(!f || !t){
+    setFS('', '等待输入文件信息...', 'circle-question');
+    sha = null; checking = false; return;
+  }
+  if(!t.startsWith('ghp_') && !t.startsWith('github_pat_') && !t.startsWith('github_')){
+    setFS('err', 'Token 格式不正确', 'triangle-exclamation');
+    sha = null; checking = false; return;
+  }
+  setFS('', '正在检查文件...', 'circle-notch fa-spin');
+  try{
+    const r = await fetch('https://api.github.com/repos/fsywed/fsywed.github.io/contents/' + encodeURIComponent(f), {
+      headers:{ 'Authorization':'token ' + t }
+    });
+    if(r.ok){
+      const d = await r.json();
+      sha = d.sha;
+      setFS('ok', '✓ 文件已存在，将被覆盖 (sha: ' + d.sha.substring(0,7) + ')', 'file-pen');
+    } else if(r.status === 404){
+      sha = null;
+      setFS('new', '+ 将创建新文件', 'file-plus');
+    } else if(r.status === 401){
+      setFS('err', 'Token 无效或无权限 (401)', 'lock');
+    } else {
+      setFS('err', '检查失败: HTTP ' + r.status, 'triangle-exclamation');
     }
-    
-    if(!t.startsWith('ghp_')&&!t.startsWith('github_pat_')){
-        s.textContent='令牌格式错误';
-        sha=null;
-        checking=false;
-        return;
-    }
-    
-    s.textContent='检查中...';
-    
-    try{
-        let r=await fetch(`https://api.github.com/repos/fsywed/fsywed.github.io/contents/${f}`,{
-            headers:{'Authorization':'token '+t}
-        });
-        
-        if(r.ok){
-            let d=await r.json();
-            sha=d.sha;
-            s.textContent='📝 覆盖文件';
-        }else if(r.status===404){
-            sha=null;
-            s.textContent='📄 新建文件';
-        }else{
-            sha=null;
-            s.textContent='检查失败';
-        }
-    }catch(e){
-        sha=null;
-        s.textContent='网络错误';
-    }
-    
-    checking=false;
+  } catch(err){
+    setFS('err', '网络错误: ' + err.message, 'wifi');
+  }
+  checking = false;
 }
 
 async function S(){
-    let f=document.getElementById('file').value.trim()||'test.html';
-    let t=document.getElementById('token').value.trim();
-    let m=document.getElementById('msg').value.trim();
-    let c=document.getElementById('code').value;
-    
-    if(!t||(!t.startsWith('ghp_')&&!t.startsWith('github_pat_'))){
-        alert('需要有效的GitHub令牌');
-        return;
+  const f = document.getElementById('file').value.trim() || 'page.html';
+  const t = document.getElementById('token').value.trim();
+  const m = document.getElementById('msg').value.trim() || ('CodeLab 提交 · ' + new Date().toLocaleString());
+  const content = state.currentTab === 'full'
+    ? (state.code.full || '')
+    : buildDocument();
+
+  if(!t){
+    toast('请输入有效的 GitHub Token', 'err'); return;
+  }
+  if(!t.startsWith('ghp_') && !t.startsWith('github_')){
+    toast('Token 格式不合法', 'err'); return;
+  }
+  try{ localStorage.setItem('gh_token', t); }catch(_){}
+
+  setStatus('提交中...', 'info');
+  try{
+    const payload = {
+      message: m,
+      content: btoa(unescape(encodeURIComponent(content))),
+      branch: 'main'
+    };
+    if(sha !== null) payload.sha = sha;
+
+    const r = await fetch('https://api.github.com/repos/fsywed/fsywed.github.io/contents/' + encodeURIComponent(f), {
+      method: 'PUT',
+      headers:{ 'Authorization':'token ' + t, 'Content-Type':'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if(r.ok){
+      const d = await r.json();
+      sha = d.content && d.content.sha;
+      setStatus('✅ 提交成功', 'ok');
+      toast('已提交到 GitHub: ' + f, 'ok');
+      closeAll();
+    } else {
+      const e = await r.json().catch(()=>({}));
+      throw new Error((e.message || 'HTTP ' + r.status));
     }
-    
-    let b=document.querySelector('.github');
-    b.disabled=true;
-    b.textContent='提交中';
-    document.getElementById('status').textContent='提交中...';
-    
-    try{
-        let p={
-            message:m||`提交 ${new Date().toLocaleTimeString()}`,
-            content:btoa(unescape(encodeURIComponent(c))),
-            branch:'main'
-        };
-        
-        if(sha!==null){
-            p.sha=sha;
-        }
-        
-        let r=await fetch(`https://api.github.com/repos/fsywed/fsywed.github.io/contents/${f}`,{
-            method:'PUT',
-            headers:{
-                'Authorization':'token '+t,
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify(p)
-        });
-        
-        if(r.ok){
-            document.getElementById('status').textContent='✅ 成功';
-            alert(sha?'✅ 文件已覆盖':'✅ 文件已创建');
-            localStorage.setItem('token',t);
-            H();
-        }else{
-            let e=await r.json();
-            throw new Error(e.message||`错误 ${r.status}`);
-        }
-    }catch(e){
-        document.getElementById('status').textContent='❌ 失败';
-        alert('提交失败: '+e.message);
-    }finally{
-        b.disabled=false;
-        b.textContent='提交';
-    }
+  } catch(err){
+    setStatus('提交失败', 'error');
+    toast('提交失败: ' + err.message, 'err');
+  }
 }
 
-// 防止iframe内部跳转
-document.getElementById('editorIframe').addEventListener('load', function() {
-    try {
-        const iframeWindow = this.contentWindow;
-        iframeWindow.onbeforeunload = function() {
-            return false;
-        };
-        
-        iframeWindow.document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A') {
-                e.preventDefault();
-                const url = e.target.href;
-                document.getElementById('editorIframe').src = url;
-            }
-        });
-    } catch(e) {
-        // 跨域限制，忽略
-    }
+/* ======================================================
+   DRAGGER: resize left/right
+   ====================================================== */
+(function initDrag(){
+  const drag = document.getElementById('dragH');
+  const left = document.getElementById('leftPanel');
+  const right = document.getElementById('rightPanel');
+  const panels = document.getElementById('panels');
+  if(!drag || !left || !right) return;
+
+  let dragging = false;
+  drag.addEventListener('mousedown', (e)=>{
+    dragging = true; drag.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    const rect = panels.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const total = rect.width - 6;
+    const lp = Math.max(20, Math.min(80, (x/total)*100));
+    left.style.flex = lp + ' 1 0%';
+    right.style.flex = (100-lp) + ' 1 0%';
+  });
+  document.addEventListener('mouseup', ()=>{
+    if(!dragging) return;
+    dragging = false; drag.classList.remove('active');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
+/* ======================================================
+   KEYBOARD: global shortcuts
+   ====================================================== */
+document.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey||e.metaKey) && e.key === 'Escape'){ closeAll(); }
+  if(e.key === 'Escape' && document.getElementById('overlay').classList.contains('show')){
+    closeAll();
+  }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'b'){
+    e.preventDefault(); toggleConsole();
+  }
 });
 
-// 事件
-document.getElementById('code').addEventListener('input',function(){
-    updateLineNumbers();
-    if(document.getElementById('auto').checked){
-        clearTimeout(window.T);
-        window.T=setTimeout(R,500);
-    }
-});
+/* ======================================================
+   INIT
+   ====================================================== */
+function init(){
+  load();
+  switchTab('html');
+  toggleAuto(); // apply default style
+  state.autoRun = true; // keep true
+  $autoBtn.classList.add('active');
+  setTimeout(()=>{
+    try { R(); } catch(e){}
+    logToConsole('info', '欢迎使用 CodeLab v2.0 · 代码已就绪');
+  }, 300);
+}
+init();
 
-document.getElementById('code').addEventListener('scroll',syncScroll);
-document.getElementById('type').addEventListener('change',R);
-
-// 初始化
-window.addEventListener('load',function(){
-    updateLineNumbers();
-    R();
-    toggleMode('file');
-});
-
-document.getElementById('code').addEventListener('focus',updateLineNumbers);
+// Expose some globals for HTML onclick
+window.R = R; window.E = E; window.F = F; window.D = D; window.S = S; window.C = C;
+window.closeAll = closeAll; window.clearAll = clearAll; window.tryLoad = tryLoad;
+window.loadBrowse = loadBrowse; window.iframeBack = iframeBack; window.iframeReload = iframeReload;
+window.toggleAuto = toggleAuto; window.toggleConsole = toggleConsole;
+window.downloadCode = downloadCode; window.copyCode = copyCode; window.goHome = goHome;
+window.handleConsoleInput = handleConsoleInput; window.clearConsole = clearConsole;
+window.switchMode = switchMode;
 </script>
 </body>
 </html>
