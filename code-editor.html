@@ -4,21 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>代码预览器</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .header{background:#007acc;color:white;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.header h2{font-size:1.1rem;margin:0}
+.header h2{font-size:1.1rem;margin:0;display:flex;align-items:center;gap:8px}
 .header p{margin:0;font-size:0.78rem;opacity:0.85}
 .container{display:flex;flex:1;overflow:hidden}
-.sidebar{width:48px;background:#252526;border-right:1px solid #333;display:flex;flex-direction:column;align-items:center;padding-top:8px;gap:4px;overflow-y:auto;flex-shrink:0}
-.icon-btn{width:36px;height:36px;background:#333;border:1px solid #3e3e42;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#d4d4d4;transition:all .15s;flex-shrink:0}
-.icon-btn:hover{background:#0e639c;border-color:#007acc}
-.icon-btn.active{background:#0e639c;border-color:#007acc}
+.sidebar{width:52px;background:#252526;border-right:1px solid #333;display:flex;flex-direction:column;align-items:center;padding-top:8px;gap:4px;overflow-y:auto;flex-shrink:0}
+.icon-btn{width:40px;height:40px;background:#333;border:1px solid #3e3e42;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#d4d4d4;transition:all .15s;flex-shrink:0;position:relative}
+.icon-btn:hover{background:#0e639c;border-color:#007acc;color:#fff;transform:translateY(-1px)}
+.icon-btn.active{background:#0e639c;border-color:#007acc;color:#fff}
+.icon-btn .tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#007acc;color:#fff;padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;display:none;z-index:100;pointer-events:none}
+.icon-btn:hover .tip{display:block}
 .sidebar hr{width:28px;border:none;border-top:1px solid #3e3e42;margin:4px 0}
 .panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .panel-header{background:#252526;padding:6px 10px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-shrink:0}
-.panel-header span{font-size:13px;color:#ccc}
+.panel-header span{font-size:13px;color:#ccc;display:flex;align-items:center;gap:6px}
 .panel-header select{background:#3c3c3c;color:#d4d4d4;border:1px solid #555;padding:3px 6px;border-radius:3px;font-size:12px}
 .editor-container{display:flex;flex:1;overflow:hidden}
 .line-numbers{background:#252526;color:#858585;padding:10px 6px;font:14px Consolas,'Courier New',monospace;text-align:right;min-width:48px;overflow:hidden;user-select:none;flex-shrink:0;line-height:21px}
@@ -33,6 +36,19 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 .out-ok{color:#4ec9b0}
 .out-info{color:#569cd6}
 .out-meta{color:#858585;font-size:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #333}
+/* 浏览模式 */
+#browseMode{flex:1;display:none;flex-direction:column;overflow:hidden}
+.browse-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#252526;border-bottom:1px solid #333}
+.browse-bar input{flex:1;background:#1e1e1e;border:1px solid #555;color:#d4d4d4;padding:5px 10px;border-radius:3px;font-size:12px;outline:none}
+.browse-bar input:focus{border-color:#007acc}
+.browse-bar button{background:#0e639c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;font-size:12px}
+.browse-bar button:hover{background:#1177bb}
+#browseFrame{flex:1;border:none;background:#fff;width:100%}
+.browse-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#252526;border:1px solid #444;border-radius:8px;padding:20px 30px;text-align:center;z-index:10;display:none;max-width:300px}
+.browse-hint i{font-size:32px;color:#007acc;margin-bottom:10px}
+.browse-hint p{font-size:13px;color:#ccc;margin-bottom:12px;line-height:1.5}
+.browse-hint a{display:inline-block;background:#0e639c;color:#fff;padding:6px 16px;border-radius:4px;text-decoration:none;font-size:12px}
+.browse-hint a:hover{background:#1177bb}
 .button{background:#0e639c;color:white;border:none;padding:5px 12px;border-radius:3px;cursor:pointer;margin-left:4px;font-size:12px;transition:background .15s}
 .button:hover{background:#1177bb}
 .button.green{background:#16825d}
@@ -66,50 +82,69 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 </head>
 <body>
 <div class="header">
-  <h2>代码预览器</h2>
+  <h2><i class="fa-solid fa-code"></i> 代码预览器</h2>
   <p>编辑代码，实时预览 · 支持 HTML / CSS / JS / Python / C++</p>
 </div>
 <div class="container">
   <div class="sidebar">
-    <button class="icon-btn active" title="HTML" onclick="setLang('html')">📄</button>
-    <button class="icon-btn" title="CSS" onclick="setLang('css')">🎨</button>
-    <button class="icon-btn" title="JavaScript" onclick="setLang('js')">⚡</button>
-    <button class="icon-btn" title="完整页面" onclick="setLang('full')">🌐</button>
-    <button class="icon-btn" title="Python" onclick="setLang('python')">🐍</button>
-    <button class="icon-btn" title="C++" onclick="setLang('cpp')">⚙️</button>
+    <button class="icon-btn active" onclick="setLang('html')"><i class="fa-brands fa-html5" style="color:#e44d26"></i><span class="tip">HTML</span></button>
+    <button class="icon-btn" onclick="setLang('css')"><i class="fa-brands fa-css3-alt" style="color:#1572b6"></i><span class="tip">CSS</span></button>
+    <button class="icon-btn" onclick="setLang('js')"><i class="fa-brands fa-js" style="color:#f7df1e"></i><span class="tip">JavaScript</span></button>
+    <button class="icon-btn" onclick="setLang('full')"><i class="fa-solid fa-globe" style="color:#4ec9b0"></i><span class="tip">完整页面</span></button>
+    <button class="icon-btn" onclick="setLang('python')"><i class="fa-brands fa-python" style="color:#3572a5"></i><span class="tip">Python</span></button>
+    <button class="icon-btn" onclick="setLang('cpp')"><i class="fa-solid fa-hashtag" style="color:#00599c"></i><span class="tip">C++</span></button>
     <hr>
-    <button class="icon-btn" title="GitHub" onclick="openExternal('github')">🐙</button>
-    <button class="icon-btn" title="DeepSeek" onclick="openExternal('deepseek')">🤖</button>
-    <button class="icon-btn" title="搜索" onclick="openExternal('search')">🔍</button>
+    <button class="icon-btn" onclick="openExternal('github')"><i class="fa-brands fa-github" style="color:#fff"></i><span class="tip">GitHub</span></button>
+    <button class="icon-btn" onclick="openExternal('deepseek')"><i class="fa-solid fa-robot" style="color:#9b59b6"></i><span class="tip">DeepSeek</span></button>
+    <button class="icon-btn" onclick="openExternal('search')"><i class="fa-solid fa-magnifying-glass" style="color:#3498db"></i><span class="tip">搜索</span></button>
     <hr>
-    <button class="icon-btn" title="清空" onclick="clearCode()">🗑️</button>
-    <button class="icon-btn" title="复制" onclick="copyCode()">📋</button>
+    <button class="icon-btn" onclick="clearCode()"><i class="fa-solid fa-trash-can" style="color:#e74c3c"></i><span class="tip">清空</span></button>
+    <button class="icon-btn" onclick="copyCode()"><i class="fa-solid fa-copy" style="color:#95a5a6"></i><span class="tip">复制</span></button>
+  </div>
+  <div class="panel" id="leftPanel">
+    <div id="editorMode" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="panel-header">
+        <span id="editorLabel"><i class="fa-brands fa-html5"></i> 编辑器 - HTML</span>
+        <select id="type" onchange="setLang(this.value)">
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="js">JS</option>
+          <option value="full">完整页面</option>
+          <option value="python">Python</option>
+          <option value="cpp">C++</option>
+        </select>
+      </div>
+      <div class="editor-container">
+        <div class="line-numbers" id="lineNumbers"><div>1</div></div>
+        <textarea id="code" class="code-textarea" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div id="browseMode">
+      <div class="browse-bar">
+        <button onclick="backToEditor()" title="返回编辑器"><i class="fa-solid fa-arrow-left"></i></button>
+        <input id="urlBar" placeholder="输入网址..." onkeydown="if(event.key==='Enter')navigateTo(this.value)">
+        <button onclick="navigateTo(document.getElementById('urlBar').value)" title="前往"><i class="fa-solid fa-arrow-right"></i></button>
+        <button onclick="reloadBrowse()" title="刷新"><i class="fa-solid fa-rotate"></i></button>
+        <button onclick="openInNewTab()" title="在新标签页打开"><i class="fa-solid fa-up-right-from-square"></i></button>
+      </div>
+      <div style="flex:1;position:relative;overflow:hidden">
+        <iframe id="browseFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"></iframe>
+        <div class="browse-hint" id="browseHint">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <p id="hintText">该网站可能不允许嵌入。<br>点击下方按钮在新标签页打开：</p>
+          <a href="#" id="hintLink" target="_blank">在新标签页打开 →</a>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="panel">
     <div class="panel-header">
-      <span id="editorLabel">编辑器 - HTML</span>
-      <select id="type" onchange="setLang(this.value)">
-        <option value="html">HTML</option>
-        <option value="css">CSS</option>
-        <option value="js">JS</option>
-        <option value="full">完整页面</option>
-        <option value="python">Python</option>
-        <option value="cpp">C++</option>
-      </select>
-    </div>
-    <div class="editor-container">
-      <div class="line-numbers" id="lineNumbers"><div>1</div></div>
-      <textarea id="code" class="code-textarea" spellcheck="false"></textarea>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-header">
-      <span id="previewLabel">预览</span>
+      <span id="previewLabel"><i class="fa-solid fa-eye"></i> 预览</span>
       <div>
-        <button class="button" onclick="runCode()">▶ 运行</button>
-        <button class="button green" onclick="loadExample()">示例</button>
-        <button class="button orange" onclick="fullscreen()">全屏</button>
-        <button class="button" onclick="openGitHubDlg()">提交</button>
+        <button class="button" onclick="runCode()"><i class="fa-solid fa-play"></i> 运行</button>
+        <button class="button green" onclick="loadExample()"><i class="fa-solid fa-wand-magic-sparkles"></i> 示例</button>
+        <button class="button orange" onclick="fullscreen()"><i class="fa-solid fa-expand"></i> 全屏</button>
+        <button class="button" onclick="openGitHubDlg()"><i class="fa-brands fa-github"></i> 提交</button>
       </div>
     </div>
     <div id="iframeWrap"><iframe id="preview" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe></div>
@@ -122,7 +157,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 </div>
 <div class="overlay" id="overlay" onclick="closeDialog()"></div>
 <div id="dialog">
-  <div class="dlg-head"><h3>提交到 GitHub</h3><button class="dlg-close" onclick="closeDialog()">×</button></div>
+  <div class="dlg-head"><h3><i class="fa-brands fa-github"></i> 提交到 GitHub</h3><button class="dlg-close" onclick="closeDialog()">×</button></div>
   <div class="dlg-body">
     <input id="file" placeholder="文件名 (如: test.html)" oninput="checkFile()">
     <textarea id="msg" placeholder="提交说明">代码预览器提交</textarea>
@@ -138,6 +173,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 // ===== 状态 =====
 let currentLang='html';
 let sha=null,checking=false;
+let currentBrowseUrl='';
 const codeStore={html:'',css:'',js:'',full:'',python:'',cpp:''};
 const examples={
   html:'<h1>Hello World</h1>\n<p>编辑左侧代码，右侧实时预览</p>\n<button onclick="alert(\'你好\')">点击</button>',
@@ -147,6 +183,8 @@ const examples={
   python:'# Python 示例\nfor i in range(1, 6):\n    print(f"第 {i} 行: Hello Python!")\n\nprint("计算 1+2+...+10 =", sum(range(1,11)))',
   cpp:'// C++ 示例\n#include <iostream>\nusing namespace std;\n\nint main(){\n    for(int i=1;i<=5;i++)\n        cout << "第 " << i << " 行: Hello C++!" << endl;\n    cout << "1+2+...+10 = " << 55 << endl;\n    return 0;\n}'
 };
+const langIcons={html:'fa-brands fa-html5',css:'fa-brands fa-css3-alt',js:'fa-brands fa-js',full:'fa-solid fa-globe',python:'fa-brands fa-python',cpp:'fa-solid fa-hashtag'};
+const langLabels={html:'HTML',css:'CSS',js:'JavaScript',full:'完整页面',python:'Python',cpp:'C++'};
 const $code=document.getElementById('code');
 const $ln=document.getElementById('lineNumbers');
 const $type=document.getElementById('type');
@@ -157,6 +195,12 @@ const $outputWrap=document.getElementById('outputWrap');
 const $output=document.getElementById('output');
 const $editorLabel=document.getElementById('editorLabel');
 const $previewLabel=document.getElementById('previewLabel');
+const $editorMode=document.getElementById('editorMode');
+const $browseMode=document.getElementById('browseMode');
+const $browseFrame=document.getElementById('browseFrame');
+const $urlBar=document.getElementById('urlBar');
+const $browseHint=document.getElementById('browseHint');
+const $hintLink=document.getElementById('hintLink');
 
 // ===== 行号 =====
 function updateLineNumbers(){
@@ -177,9 +221,9 @@ function setLang(lang){
   const btns=document.querySelectorAll('.sidebar .icon-btn');
   const idx=['html','css','js','full','python','cpp'].indexOf(lang);
   if(idx>=0&&btns[idx]) btns[idx].classList.add('active');
-  const labels={html:'HTML',css:'CSS',js:'JavaScript',full:'完整页面',python:'Python',cpp:'C++'};
-  $editorLabel.textContent='编辑器 - '+labels[lang];
-  $previewLabel.textContent=(lang==='python'||lang==='cpp')?'运行输出':'预览';
+  $editorLabel.innerHTML='<i class="'+langIcons[lang]+'"></i> 编辑器 - '+langLabels[lang];
+  $previewLabel.innerHTML=(lang==='python'||lang==='cpp')?'<i class="fa-solid fa-terminal"></i> 运行输出':'<i class="fa-solid fa-eye"></i> 预览';
+  backToEditor();
   updateLineNumbers();
   if(document.getElementById('auto').checked) runCode();
 }
@@ -192,7 +236,6 @@ function runCode(){
   if(lang==='python'||lang==='cpp'){runPiston(lang,code)}
   else{runWeb(code)}
 }
-
 function runWeb(code){
   $iframeWrap.style.display='block';
   $outputWrap.style.display='none';
@@ -205,52 +248,91 @@ function runWeb(code){
   $status.textContent='已更新 '+new Date().toLocaleTimeString();
 }
 
-// ===== Piston API 运行 Python/C++ =====
+// ===== Piston API 运行 Python/C++（带超时）=====
 async function runPiston(lang,code){
   $iframeWrap.style.display='none';
   $outputWrap.style.display='block';
-  $output.innerHTML='<div class="out-info">⏳ 正在编译运行，请稍候...</div>';
+  $output.innerHTML='<div class="out-info"><i class="fa-solid fa-spinner fa-spin"></i> 正在编译运行，请稍候...</div>';
   $status.textContent='运行中...';
   const cfg={python:{language:'python',version:'3.10.0',file:'main.py'},cpp:{language:'c++',version:'10.2.0',file:'main.cpp'}}[lang];
   if(!cfg){$output.innerHTML='<div class="out-err">不支持的语言</div>';return}
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),30000);
   try{
     const r=await fetch('https://emkc.org/api/v2/piston/execute',{
-      method:'POST',
+      method:'POST',signal:ctrl.signal,
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({language:cfg.language,version:cfg.version,files:[{name:cfg.file,content:code}]})
     });
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    clearTimeout(timer);
+    if(!r.ok) throw new Error('服务器返回 HTTP '+r.status);
     const d=await r.json();
-    let out='<div class="out-meta">语言: '+cfg.language+' | 退出码: '+(d.run?d.run.code:'?')+' | 耗时: '+(d.run?d.run.output.length+'字符输出':'')+'</div>';
+    let out='<div class="out-meta">语言: '+cfg.language+' '+cfg.version+' | 退出码: '+(d.run?d.run.code:'?')+'</div>';
+    if(d.compile&&d.compile.stderr) out+='<div class="out-err">[编译错误]\n'+escapeHtml(d.compile.stderr)+'</div>';
     if(d.run&&d.run.stdout) out+='<div class="out-ok">'+escapeHtml(d.run.stdout)+'</div>';
     if(d.run&&d.run.stderr) out+='<div class="out-err">'+escapeHtml(d.run.stderr)+'</div>';
-    if(d.compile&&d.compile.stderr) out+='<div class="out-err">[编译错误]\n'+escapeHtml(d.compile.stderr)+'</div>';
-    if(!((d.run&&d.run.stdout)||(d.run&&d.run.stderr)||(d.compile&&d.compile.stderr))) out+='<div class="out-info">(无输出)</div>';
+    if(!((d.run&&d.run.stdout)||(d.run&&d.run.stderr)||(d.compile&&d.compile.stderr))) out+='<div class="out-info">(程序无输出)</div>';
     $output.innerHTML=out;
     $status.textContent='✅ 运行完成 '+new Date().toLocaleTimeString();
   }catch(e){
-    $output.innerHTML='<div class="out-err">❌ 运行失败: '+escapeHtml(e.message)+'</div><div class="out-info">提示: Piston API 可能暂时不可用，请稍后重试</div>';
+    clearTimeout(timer);
+    let msg=e.name==='AbortError'?'请求超时（30秒），请检查网络或简化代码':e.message;
+    $output.innerHTML='<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行失败: '+escapeHtml(msg)+'</div><div class="out-info"><i class="fa-solid fa-lightbulb"></i> 提示: Piston API 可能暂时不可用，请稍后重试<br>如果持续失败，可能是网络限制，建议使用科学上网</div>';
     $status.textContent='❌ 运行失败';
   }
 }
-
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-// ===== 外部链接（新标签页打开，避免 iframe 被拒绝）=====
+// ===== 外部网页：在当前页 iframe 显示 =====
+const extUrls={
+  github:'https://github1s.com/fsywed/fsywed.github.io',
+  deepseek:'https://chat.deepseek.com',
+  search:'https://www.bing.com'
+};
 function openExternal(type){
-  const urls={
-    github:'https://github.com/fsywed/fsywed.github.io',
-    deepseek:'https://chat.deepseek.com',
-    search:'https://www.bing.com'
-  };
-  const url=urls[type];
-  if(url){
-    window.open(url,'_blank');
-    $status.textContent='已在新标签页打开: '+type;
-  }
+  const url=extUrls[type]||extUrls.search;
+  currentBrowseUrl=url;
+  $editorMode.style.display='none';
+  $browseMode.style.display='flex';
+  $browseHint.style.display='none';
+  $urlBar.value=url;
+  $browseFrame.src=url;
+  $status.textContent='加载: '+url;
+  // 5秒后检测是否加载失败（X-Frame-Options 拒绝）
+  clearTimeout(window._bt);
+  window._bt=setTimeout(()=>{
+    try{
+      if($browseFrame.contentDocument===null) showBrowseHint(url);
+    }catch(e){showBrowseHint(url)}
+  },5000);
+}
+function showBrowseHint(url){
+  $browseHint.style.display='block';
+  $hintLink.href=url;
+  $status.textContent='该网站可能不允许嵌入';
+}
+function navigateTo(url){
+  if(!url) return;
+  if(!/^https?:\/\//i.test(url)) url='https://'+url;
+  currentBrowseUrl=url;
+  $browseHint.style.display='none';
+  $browseFrame.src=url;
+  $status.textContent='加载: '+url;
+  clearTimeout(window._bt);
+  window._bt=setTimeout(()=>{
+    try{if($browseFrame.contentDocument===null) showBrowseHint(url)}catch(e){showBrowseHint(url)}
+  },5000);
+}
+function reloadBrowse(){$browseFrame.src=currentBrowseUrl}
+function openInNewTab(){if(currentBrowseUrl) window.open(currentBrowseUrl,'_blank')}
+function backToEditor(){
+  $browseMode.style.display='none';
+  $editorMode.style.display='flex';
+  $browseFrame.src='about:blank';
+  $browseHint.style.display='none';
 }
 
-// ===== 示例 =====
+// ===== 示例/清空/复制/全屏 =====
 function loadExample(){
   $code.value=examples[currentLang]||'';
   codeStore[currentLang]=$code.value;
@@ -258,31 +340,19 @@ function loadExample(){
   runCode();
   $status.textContent='已载入示例';
 }
-
-// ===== 清空 =====
 function clearCode(){
   if(!confirm('确认清空当前代码？'))return;
-  $code.value='';
-  codeStore[currentLang]='';
-  updateLineNumbers();
-  $status.textContent='已清空';
+  $code.value='';codeStore[currentLang]='';
+  updateLineNumbers();$status.textContent='已清空';
 }
-
-// ===== 复制 =====
 function copyCode(){
-  $code.select();
-  document.execCommand('copy');
+  $code.select();document.execCommand('copy');
   $status.textContent='已复制到剪贴板';
 }
-
-// ===== 全屏 =====
 function fullscreen(){
   const p=document.querySelector('.panel:last-child');
-  if(!document.fullscreenElement){
-    p.requestFullscreen&&p.requestFullscreen();
-  }else{
-    document.exitFullscreen&&document.exitFullscreen();
-  }
+  if(!document.fullscreenElement){p.requestFullscreen&&p.requestFullscreen()}
+  else{document.exitFullscreen&&document.exitFullscreen()}
 }
 
 // ===== GitHub 提交 =====
@@ -299,8 +369,7 @@ function closeDialog(){
   sha=null;
 }
 async function checkFile(){
-  if(checking)return;
-  checking=true;
+  if(checking)return;checking=true;
   let f=document.getElementById('file').value.trim();
   let t=document.getElementById('token').value.trim();
   let s=document.getElementById('fs');
@@ -336,8 +405,7 @@ $code.addEventListener('input',()=>{
   codeStore[currentLang]=$code.value;
   updateLineNumbers();
   if(document.getElementById('auto').checked&&currentLang!=='python'&&currentLang!=='cpp'){
-    clearTimeout(window._t);
-    window._t=setTimeout(runCode,500);
+    clearTimeout(window._t);window._t=setTimeout(runCode,500);
   }
 });
 $code.addEventListener('scroll',syncScroll);
@@ -349,10 +417,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDialog()});
 
 // ===== 初始化 =====
 window.addEventListener('load',()=>{
-  $code.value=examples.html;
-  codeStore.html=examples.html;
-  updateLineNumbers();
-  runWeb(examples.html);
+  $code.value=examples.html;codeStore.html=examples.html;
+  updateLineNumbers();runWeb(examples.html);
 });
 </script>
 </body>
