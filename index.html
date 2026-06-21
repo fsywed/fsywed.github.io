@@ -1,22 +1,780 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>创意空间站</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>
-:root{--pc:#4361ee;--sc:#3a0ca3;--ac:#f72585;--c1:#1a2a6c;--c2:#b21f1f;--c3:#fdbb2d;--lc:#f8f9fa;--dc:#212529;--sd:0 10px 20px rgba(0,0,0,0.1)}*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Microsoft YaHei',sans-serif}body{line-height:1.6;color:var(--dc);background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3));min-height:100vh}*:focus{outline:none}.navbar{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 5%;background:rgba(255,255,255,0.95);box-shadow:var(--sd);position:sticky;top:0;z-index:1000}.logo{font-size:1.8rem;font-weight:700;color:var(--pc);text-decoration:none;display:flex;align-items:center;gap:10px}.nav-links{display:flex;list-style:none;gap:2rem}.nav-links a{text-decoration:none;color:var(--dc);font-weight:500;padding:0.5rem 0}.mobile-menu-btn{display:none;font-size:1.5rem;background:none;border:none;cursor:pointer;color:var(--dc);width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.top-right{display:flex;align-items:center;gap:15px;position:relative}.lang-btn,.login-btn{background:linear-gradient(45deg,var(--ac),#FF4B2B);color:white;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;font-weight:bold;font-size:0.9em}.login-btn{padding:8px 20px}.color-toggle{width:36px;height:36px;border-radius:50%;background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red);border:2px solid white;cursor:pointer}.color-dropdown{position:absolute;top:45px;right:0;background:#252525;border-radius:10px;padding:10px;display:none;flex-direction:column;gap:8px;min-width:150px;box-shadow:0 5px 20px rgba(0,0,0,0.5);z-index:100}.color-option{width:30px;height:30px;border-radius:50%;border:2px solid white;cursor:pointer}.hero{text-align:center;padding:6rem 5%;margin:30px auto;max-width:1200px;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-radius:20px;border:1px solid rgba(255,255,255,0.2);color:white}.hero h1{font-size:3.5rem;margin-bottom:1rem;background:linear-gradient(45deg,#FF416C,#FF4B2B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeInUp 2.5s ease}.hero p{font-size:1.2rem;max-width:700px;margin:0 auto 2rem;opacity:0.9}.emoji-large{font-size:4em;margin:25px 0}.container{padding:0 5% 5rem}.section-title{text-align:center;margin-bottom:3rem;font-size:2.2rem;color:white;position:relative}.section-title::after{content:'';position:absolute;width:80px;height:4px;background-color:var(--ac);bottom:-10px;left:50%;transform:translateX(-50%)}.content-grid{display:grid;grid-template-columns:1fr;gap:3rem;margin-bottom:4rem}.content-row{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;min-height:350px}.content-card{background:rgba(255,255,255,0.15);padding:2.5rem;border-radius:15px;border:1px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;justify-content:center;height:100%}.content-card:hover{transform:translateY(-10px);background:rgba(255,255,255,0.25);box-shadow:0 15px 30px rgba(0,0,0,0.2)}.content-card h3{font-size:1.8rem;margin-bottom:1rem;color:white}.content-card p{color:rgba(255,255,255,0.9);margin-bottom:1.5rem}.intro-card{text-align:left}.intro-card .emoji-large{text-align:center}.enter-card{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.jump-btn{background:linear-gradient(45deg,#667eea,#764ba2);color:white;border:none;padding:1rem 2.5rem;border-radius:25px;cursor:pointer;font-weight:bold;min-width:200px}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999;display:none}.login-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#2a2a3a,#1a1a2a);padding:35px;border-radius:25px;z-index:1000;display:none;width:420px;box-shadow:0 20px 50px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1)}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.modal-header h3{font-size:1.4em;margin:0;background:linear-gradient(45deg,#FF416C,#FF4B2B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.footer{background-color:rgba(0,0,0,0.7);color:white;padding:3rem 5% 2rem;text-align:center;margin-top:4rem}.input-group{margin-bottom:20px}.input-group input,.input-group textarea{width:100%;padding:12px;border:none;border-radius:10px;font-size:15px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2)}.input-group textarea{height:90px;resize:vertical}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@media(max-width:768px){.nav-links{display:none;position:absolute;top:100%;left:0;width:100%;background:rgba(255,255,255,0.98);flex-direction:column;padding:0;box-shadow:0 10px 30px rgba(0,0,0,0.15);border-radius:0 0 15px 15px}.nav-links.active{display:flex}.nav-links li{width:100%}.nav-links a{padding:1rem 1.8rem;border-bottom:1px solid rgba(0,0,0,0.05);display:block}.nav-links li:last-child a{border-bottom:none}.mobile-menu-btn{display:flex}.hero h1{font-size:2.5rem}.hero p{font-size:1rem}.content-row{grid-template-columns:1fr;gap:1.5rem}.login-modal{width:95vw;padding:20px}}@media(max-width:480px){.top-right{gap:10px}.lang-btn,.login-btn{padding:6px 12px;font-size:0.8em}.color-toggle{width:32px;height:32px}.jump-btn{min-width:160px;padding:0.8rem 1.5rem}}
-</style></head><body>
-<nav class="navbar"><a href="#" class="logo"><span style="font-size:1.3em">🚀</span>创意空间站</a><ul class="nav-links"><li><a href="#home" data-i18n="nav.home">首页</a></li><li><a href="#features" data-i18n="nav.features">功能模块</a></li><li><a href="#about" data-i18n="nav.about">关于</a></li><li><a href="#contact" data-i18n="nav.contact">联系</a></li></ul><div class="top-right"><button class="lang-btn" onclick="TL()">EN</button><div class="color-toggle" onclick="TC(event)"></div><div class="color-dropdown" id="cd"><div class="color-option" style="background:#1a2a6c" onclick="SC('#1a2a6c','#b21f1f','#fdbb2d')"></div><div class="color-option" style="background:#0f4c75" onclick="SC('#0f4c75','#3282b8','#bbe1fa')"></div><div class="color-option" style="background:#1a1a2e" onclick="SC('#1a1a2e','#16213e','#0f3460')"></div></div><button class="login-btn" onclick="SM()" data-i18n="nav.login">登录</button><button class="mobile-menu-btn" id="mb"></button></div></nav>
-<main><section class="hero" id="home"><h1 data-i18n="hero.title">创意空间站</h1><p data-i18n="hero.desc">融合游戏、创作与探索的现代化数字平台。体验丰富互动，编写实时代码，见证成长历程。</p><div class="emoji-large">🎮💻📊</div></section><div class="container"><h2 class="section-title" id="features" data-i18n="features.title">核心功能模块</h2><div class="content-grid"><div class="content-row"><div class="content-card intro-card" data-module="0"><div class="emoji-large">🎮</div><h3 data-i18n="modules.0.title">游戏大厅</h3><p data-i18n="modules.0.desc">精心挑选的多款在线游戏，从休闲益智到动作冒险，总有一款适合你。体验流畅的操作和丰富的游戏内容，随时随地进行一场精彩的冒险。</p></div><div class="content-card enter-card"><h3 data-i18n="modules.0.btnDesc">即刻畅玩</h3><p data-i18n="modules.0.btnPrompt">点击下方按钮，立即进入游戏大厅，开启你的游戏之旅！</p><button class="jump-btn" onclick="window.location.href='game.html'" data-i18n="modules.0.btnEnter">进入游戏大厅 →</button></div></div><div class="content-row"><div class="content-card enter-card"><h3 data-i18n="modules.1.btnDesc">在线编码</h3><p data-i18n="modules.1.btnPrompt">点击下方按钮，打开功能强大的在线编辑器，开始编写你的代码！</p><button class="jump-btn" onclick="window.location.href='code-editor.html'" data-i18n="modules.1.btnEnter">← 打开代码编辑器</button></div><div class="content-card intro-card" data-module="1"><div class="emoji-large">💻</div><h3 data-i18n="modules.1.title">在线编辑器</h3><p data-i18n="modules.1.desc">实时编写和预览HTML、CSS、JavaScript代码，支持语法高亮、自动补全和一键保存到GitHub。无论学习还是创作，这里都是你的理想工具。</p></div></div><div class="content-row"><div class="content-card intro-card" data-module="2"><div class="emoji-large">📊</div><h3 data-i18n="modules.2.title">建站历程</h3><p data-i18n="modules.2.desc">见证我们从零开始的成长轨迹，查看详细的运行时间、里程碑和版本迭代记录。了解创意空间站背后的故事与未来规划。</p></div><div class="content-card enter-card"><h3 data-i18n="modules.2.btnDesc">查看历程</h3><p data-i18n="modules.2.btnPrompt">点击下方按钮，探索我们的发展历程和未来计划！</p><button class="jump-btn" onclick="window.location.href='anniversary.html'" data-i18n="modules.2.btnEnter">查看建站时间 →</button></div></div></div></div></main>
-<footer class="footer" id="contact"><p data-i18n="footer.line1">© 2024 创意空间站 · 由 FSYWED 创建与维护</p><p data-i18n="footer.line2">探索无限可能，创造属于你的数字世界</p></footer>
-<div class="overlay" onclick="HA()"></div><div class="login-modal" id="lm"><div class="modal-header"><h3 data-i18n="modal.title">访问登记</h3><span onclick="HA()" style="cursor:pointer;font-size:24px;color:#aaa">×</span></div><div class="input-group"><input type="text" id="un" data-placeholder-i18n="modal.namePlaceholder" placeholder="你的名字（可选）"></div><div class="input-group"><textarea id="note" data-placeholder-i18n="modal.notePlaceholder" placeholder="留言（可选）"></textarea></div><div id="ls" style="margin:15px 0;font-size:14px;min-height:20px"></div><div style="display:flex;gap:12px;margin-top:25px"><button class="login-btn" style="flex:1;background:linear-gradient(45deg,#666,#444)" onclick="HA()" data-i18n="modal.cancel">取消</button><button class="login-btn" style="flex:1" onclick="SL()" data-i18n="modal.submit">🚀 登记并开始</button></div></div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创意空间站</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --pc:#4cc9f0;
+  --sc:#f72585;
+  --ac:#ffd166;
+  --c1:#0b0b3b;
+  --c2:#3f1d7a;
+  --c3:#f72585;
+  --lc:#f8f9fa;
+  --dc:#0f0f1e;
+  --glass:rgba(255,255,255,0.08);
+  --glass-stroke:rgba(255,255,255,0.18);
+  --sd:0 20px 60px rgba(0,0,0,0.35);
+  --sd-sm:0 8px 24px rgba(0,0,0,0.25);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans SC','Segoe UI',sans-serif;
+  line-height:1.6;color:var(--lc);
+  background:var(--c1);
+  min-height:100vh;overflow-x:hidden;
+  position:relative;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(76,201,240,0.35) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 30%, rgba(247,37,133,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(255,209,102,0.25) 0%, transparent 55%),
+    linear-gradient(135deg, var(--c1) 0%, #1a0b4a 50%, var(--c2) 100%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+*:focus{outline:none}
+
+/* ---------- NAV ---------- */
+.navbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.1rem 5%;
+  background:linear-gradient(180deg, rgba(11,11,59,0.75), rgba(11,11,59,0.35));
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  position:sticky;top:0;z-index:1000;
+}
+.logo{
+  font-size:1.5rem;font-weight:900;
+  color:#fff;text-decoration:none;
+  display:flex;align-items:center;gap:10px;
+  letter-spacing:1px;
+}
+.logo .logo-mark{
+  width:38px;height:38px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--pc),var(--sc));
+  box-shadow:0 0 20px rgba(76,201,240,0.5), 0 0 40px rgba(247,37,133,0.3);
+  font-size:1.15rem;
+  animation: pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(76,201,240,0.5), 0 0 40px rgba(247,37,133,0.3)}
+  50%{transform:scale(1.08);box-shadow:0 0 30px rgba(76,201,240,0.8), 0 0 60px rgba(247,37,133,0.5)}
+}
+.logo-text{
+  font-family:'Audiowide','Noto Sans SC',sans-serif;
+  background:linear-gradient(90deg,#fff,#4cc9f0,#f72585);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  background-size:200% auto;animation: shine 4s linear infinite;
+}
+@keyframes shine{to{background-position:200% center}}
+
+.nav-links{display:flex;list-style:none;gap:2.2rem;align-items:center}
+.nav-links a{
+  text-decoration:none;color:rgba(255,255,255,0.78);
+  font-weight:500;font-size:0.95rem;position:relative;
+  padding:0.4rem 0;transition:color .3s;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:50%;bottom:0;
+  width:0;height:2px;
+  background:linear-gradient(90deg,var(--pc),var(--sc));
+  transition:all .3s;transform:translateX(-50%);
+  border-radius:2px;
+}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{width:100%}
+
+.mobile-menu-btn{
+  display:none;font-size:1.4rem;background:none;border:none;
+  cursor:pointer;color:#fff;width:44px;height:44px;
+  align-items:center;justify-content:center;flex-shrink:0;
+}
+
+.top-right{display:flex;align-items:center;gap:12px;position:relative;flex-wrap:wrap}
+
+.pill-btn{
+  background:var(--glass);color:#fff;border:1px solid var(--glass-stroke);
+  padding:8px 16px;border-radius:999px;cursor:pointer;font-weight:600;
+  font-size:0.85rem;transition:all .3s;backdrop-filter:blur(10px);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.pill-btn:hover{
+  background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);
+  transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,0.35);
+}
+.primary-btn{
+  background:linear-gradient(135deg,var(--sc),#ff4b6e);
+  color:#fff;border:none;padding:10px 20px;border-radius:999px;
+  cursor:pointer;font-weight:700;font-size:0.9rem;
+  box-shadow:0 10px 24px rgba(247,37,133,0.45);
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.primary-btn::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--pc),#7bf1ff);
+  opacity:0;transition:opacity .3s;
+}
+.primary-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 14px 30px rgba(247,37,133,0.6)}
+.primary-btn:hover::before{opacity:1}
+.primary-btn span{position:relative;z-index:1}
+
+.color-toggle{
+  width:36px;height:36px;border-radius:50%;
+  background:conic-gradient(from 0deg, #4cc9f0, #f72585, #ffd166, #4cc9f0);
+  border:2px solid rgba(255,255,255,0.5);cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(11,11,59,0.4);
+  transition:transform .3s;
+}
+.color-toggle:hover{transform:rotate(180deg) scale(1.1)}
+
+.color-dropdown{
+  position:absolute;top:52px;right:0;
+  background:rgba(15,15,30,0.95);
+  border:1px solid var(--glass-stroke);
+  border-radius:14px;padding:12px;
+  display:none;flex-direction:column;gap:10px;min-width:170px;
+  box-shadow:var(--sd);z-index:100;backdrop-filter:blur(20px);
+}
+.color-option{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 10px;border-radius:10px;cursor:pointer;
+  transition:background .2s;font-size:0.82rem;color:rgba(255,255,255,0.85);
+}
+.color-option:hover{background:rgba(255,255,255,0.08)}
+.color-swatch{
+  width:26px;height:26px;border-radius:8px;
+  border:2px solid rgba(255,255,255,0.6);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3);
+}
+
+/* ---------- HERO ---------- */
+.hero-wrap{position:relative;padding:5rem 5% 4rem}
+.hero{
+  text-align:center;padding:5rem 3rem;
+  margin:0 auto;max-width:1100px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-radius:32px;border:1px solid rgba(255,255,255,0.15);
+  color:#fff;position:relative;overflow:hidden;
+  box-shadow:var(--sd);
+}
+.hero::before{
+  content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(76,201,240,0.08) 60deg, transparent 120deg, rgba(247,37,133,0.08) 240deg, transparent 300deg);
+  animation: rotate 20s linear infinite;pointer-events:none;
+}
+@keyframes rotate{to{transform:rotate(360deg)}}
+.hero > *{position:relative;z-index:1}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:999px;
+  background:rgba(76,201,240,0.15);border:1px solid rgba(76,201,240,0.4);
+  font-size:0.78rem;letter-spacing:2px;color:#4cc9f0;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;
+  margin-bottom:1.5rem;
+}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#4cc9f0;box-shadow:0 0 10px #4cc9f0;animation:blink 1.5s infinite}
+@keyframes blink{50%{opacity:.3}}
+
+.hero h1{
+  font-size:clamp(2.4rem, 6vw, 4.5rem);
+  font-weight:900;line-height:1.1;margin-bottom:1.2rem;
+  letter-spacing:-1px;
+  font-family:'Noto Sans SC',sans-serif;
+}
+.hero h1 .grad{
+  background:linear-gradient(120deg, #4cc9f0 0%, #b5179e 45%, #f72585 75%, #ffd166 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  background-size:300% 100%;animation: gradShift 6s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+.hero p.sub{
+  font-size:clamp(1rem,1.6vw,1.2rem);
+  color:rgba(255,255,255,0.85);max-width:640px;
+  margin:0 auto 2.2rem;line-height:1.75;font-weight:400;
+}
+
+.emoji-row{
+  display:flex;justify-content:center;gap:1.5rem;
+  margin-bottom:2.5rem;font-size:2.6rem;
+}
+.emoji-row span{
+  display:inline-block;
+  filter:drop-shadow(0 6px 18px rgba(76,201,240,0.4));
+  animation: float 4s ease-in-out infinite;
+}
+.emoji-row span:nth-child(2){animation-delay:.4s}
+.emoji-row span:nth-child(3){animation-delay:.8s}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(-12px) rotate(-5deg)}
+}
+
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:1rem}
+.hero-cta .primary-btn{padding:14px 28px;font-size:1rem}
+.ghost-btn{
+  background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.3);
+  padding:14px 26px;border-radius:999px;cursor:pointer;font-weight:600;
+  font-size:1rem;transition:all .3s;display:inline-flex;align-items:center;gap:10px;
+}
+.ghost-btn:hover{background:rgba(255,255,255,0.1);border-color:#fff;transform:translateY(-2px)}
+
+.stats-row{
+  display:flex;justify-content:center;gap:3rem;margin-top:3.5rem;
+  flex-wrap:wrap;
+}
+.stat{text-align:center}
+.stat-num{
+  font-family:'Audiowide',monospace;font-size:2rem;font-weight:400;
+  background:linear-gradient(135deg,var(--pc),var(--sc));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  line-height:1;
+}
+.stat-label{font-size:0.78rem;letter-spacing:2px;color:rgba(255,255,255,0.6);margin-top:6px;text-transform:uppercase}
+
+/* ---------- SECTION TITLE ---------- */
+.container{max-width:1200px;margin:0 auto;padding:0 5% 6rem}
+.section-head{text-align:center;margin-bottom:3.5rem;padding-top:2rem}
+.section-kicker{
+  display:inline-block;padding:5px 14px;border-radius:999px;
+  background:rgba(247,37,133,0.15);border:1px solid rgba(247,37,133,0.4);
+  color:#f72585;font-size:0.75rem;letter-spacing:2.5px;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.section-title{
+  font-size:clamp(2rem,4vw,2.8rem);font-weight:900;
+  letter-spacing:-0.5px;color:#fff;
+}
+.section-title em{font-style:normal;color:var(--pc)}
+.section-sub{color:rgba(255,255,255,0.7);margin-top:.8rem;max-width:560px;margin-left:auto;margin-right:auto}
+
+/* ---------- MODULE CARDS ---------- */
+.module-list{display:flex;flex-direction:column;gap:2.5rem}
+
+.module-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:stretch;
+}
+.module-row.reverse{direction:rtl}
+.module-row.reverse > *{direction:ltr}
+
+.card{
+  background:linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+  border:1px solid var(--glass-stroke);
+  border-radius:24px;padding:2.2rem;position:relative;overflow:hidden;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s;
+  min-height:280px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(76,201,240,0.4);
+  box-shadow:0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(76,201,240,0.15);
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, transparent, var(--pc), var(--sc), transparent);
+  opacity:.6;
+}
+.card.intro{
+  background:
+    radial-gradient(ellipse at top right, rgba(76,201,240,0.15), transparent 50%),
+    linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+}
+.card.enter{
+  background:
+    radial-gradient(ellipse at bottom left, rgba(247,37,133,0.18), transparent 50%),
+    linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+}
+.card-tag{
+  display:inline-block;padding:4px 12px;border-radius:999px;
+  background:rgba(76,201,240,0.18);border:1px solid rgba(76,201,240,0.4);
+  color:#4cc9f0;font-size:0.72rem;letter-spacing:2px;
+  font-family:'JetBrains Mono',monospace;margin-bottom:1rem;text-transform:uppercase;
+}
+.card.enter .card-tag{background:rgba(247,37,133,0.18);border-color:rgba(247,37,133,0.4);color:#ff89b5}
+
+.card-icon{
+  width:64px;height:64px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg, rgba(76,201,240,0.2), rgba(247,37,133,0.2));
+  border:1px solid rgba(255,255,255,0.15);
+  font-size:2rem;margin-bottom:1.2rem;
+  box-shadow:inset 0 0 20px rgba(76,201,240,0.15);
+}
+.card.enter .card-icon{
+  background:linear-gradient(135deg, rgba(247,37,133,0.2), rgba(255,209,102,0.2));
+  box-shadow:inset 0 0 20px rgba(247,37,133,0.15);
+}
+
+.card h3{font-size:1.6rem;font-weight:800;margin-bottom:0.8rem;color:#fff;letter-spacing:-0.3px}
+.card p{color:rgba(255,255,255,0.72);font-size:0.98rem;line-height:1.75;margin-bottom:1.5rem}
+
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem}
+.feat-list li{color:rgba(255,255,255,0.78);font-size:0.9rem;display:flex;align-items:center;gap:10px}
+.feat-list li i{color:var(--pc);font-size:0.75rem;width:14px}
+.card.enter .feat-list li i{color:var(--ac)}
+
+.jump-btn{
+  align-self:flex-start;
+  background:linear-gradient(135deg,var(--pc),#7bf1ff);
+  color:#0b0b3b;border:none;padding:12px 22px;
+  border-radius:12px;cursor:pointer;font-weight:700;
+  font-size:0.92rem;transition:all .3s;
+  display:inline-flex;align-items:center;gap:10px;
+  box-shadow:0 10px 24px rgba(76,201,240,0.35);
+  font-family:'Noto Sans SC',sans-serif;
+}
+.jump-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 30px rgba(76,201,240,0.5)}
+.card.enter .jump-btn{
+  background:linear-gradient(135deg,var(--sc),#ff89b5);color:#fff;
+  box-shadow:0 10px 24px rgba(247,37,133,0.4);
+}
+.card.enter .jump-btn:hover{box-shadow:0 14px 30px rgba(247,37,133,0.55)}
+
+/* ---------- FOOTER ---------- */
+.footer{
+  text-align:center;padding:3rem 5% 2rem;
+  border-top:1px solid rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.6);
+  background:rgba(11,11,59,0.4);
+}
+.footer p:first-child{font-weight:500;color:rgba(255,255,255,0.85);margin-bottom:.3rem}
+.footer p:last-child{font-size:0.9rem;letter-spacing:1px}
+
+/* ---------- MODAL ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;z-index:2000;
+}
+.overlay.show{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.login-modal{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);
+  width:min(460px, 90vw);background:linear-gradient(145deg, #1a0b4a, #0b0b3b);
+  border:1px solid rgba(255,255,255,0.18);border-radius:22px;
+  padding:2rem;display:none;z-index:2100;
+  box-shadow:0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(76,201,240,0.1);
+}
+.login-modal.show{display:block;animation:pop .35s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes pop{to{transform:translate(-50%,-50%) scale(1)}}
+
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+.modal-header h3{
+  font-size:1.4rem;font-weight:800;color:#fff;
+  background:linear-gradient(90deg,#4cc9f0,#f72585);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.modal-close{cursor:pointer;font-size:1.5rem;color:rgba(255,255,255,0.6);transition:color .2s;line-height:1}
+.modal-close:hover{color:#fff}
+
+.input-group{margin-bottom:1rem}
+.input-group input, .input-group textarea{
+  width:100%;padding:12px 16px;border-radius:12px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);
+  color:#fff;font-size:0.95rem;font-family:inherit;
+  transition:all .2s;resize:vertical;
+}
+.input-group input:focus, .input-group textarea:focus{
+  border-color:var(--pc);background:rgba(255,255,255,0.1);
+  box-shadow:0 0 0 4px rgba(76,201,240,0.15);outline:none;
+}
+.input-group textarea{min-height:90px}
+
+#ls{margin:1rem 0;font-size:0.85rem;min-height:22px;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace}
+
+.modal-actions{display:flex;gap:12px;margin-top:1.2rem}
+.modal-actions .primary-btn,.modal-actions .pill-btn{flex:1;justify-content:center;padding:12px 20px}
+
+/* ---------- REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s, transform .8s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- MARQUEE BADGE ---------- */
+.badge-strip{
+  display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;
+  margin:3rem auto 0;max-width:900px;
+}
+.badge{
+  padding:8px 16px;border-radius:999px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.75);font-size:0.8rem;
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;
+}
+.badge i{color:var(--ac)}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 820px){
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;
+    background:rgba(11,11,59,0.97);backdrop-filter:blur(20px);padding:1.5rem 5%;gap:0.8rem;
+    border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-links.show{display:flex}
+  .mobile-menu-btn{display:flex}
+  .hero{padding:3.5rem 1.5rem}
+  .module-row{grid-template-columns:1fr;gap:1rem}
+  .module-row.reverse{direction:ltr}
+  .top-right{gap:8px}
+  .pill-btn{padding:6px 12px;font-size:0.78rem}
+  .primary-btn{padding:8px 14px;font-size:0.85rem}
+  .stats-row{gap:1.8rem}
+  .card{padding:1.6rem;min-height:auto}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="#" class="logo">
+    <span class="logo-mark">🚀</span>
+    <span class="logo-text">CREATIVE · STATION</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" data-i18n="nav.home">首页</a></li>
+    <li><a href="#features" data-i18n="nav.features">功能模块</a></li>
+    <li><a href="#about" data-i18n="nav.about">关于</a></li>
+    <li><a href="#contact" data-i18n="nav.contact">联系</a></li>
+  </ul>
+  <div class="top-right">
+    <button class="pill-btn" onclick="TL()"><i class="fas fa-language"></i><span id="langLabel">中 / EN</span></button>
+    <div class="color-toggle" onclick="TC(event)" title="切换主题"></div>
+    <div class="color-dropdown" id="cd">
+      <div class="color-option" onclick="SC('#0b0b3b','#3f1d7a','#f72585')"><span class="color-swatch" style="background:linear-gradient(135deg,#4cc9f0,#f72585)"></span><span data-i18n="theme.cyber">赛博霓虹</span></div>
+      <div class="color-option" onclick="SC('#1a2a6c','#b21f1f','#fdbb2d')"><span class="color-swatch" style="background:linear-gradient(135deg,#fdbb2d,#b21f1f)"></span><span data-i18n="theme.sunset">日落黄昏</span></div>
+      <div class="color-option" onclick="SC('#0f4c75','#3282b8','#bbe1fa')"><span class="color-swatch" style="background:linear-gradient(135deg,#bbe1fa,#0f4c75)"></span><span data-i18n="theme.ocean">深海蓝调</span></div>
+      <div class="color-option" onclick="SC('#1a1a2e','#16213e','#0f3460')"><span class="color-swatch" style="background:linear-gradient(135deg,#533483,#e94560)"></span><span data-i18n="theme.midnight">午夜极客</span></div>
+    </div>
+    <button class="primary-btn" onclick="SM()"><span><i class="fas fa-rocket"></i> <span data-i18n="nav.login">登录</span></span></button>
+    <button class="mobile-menu-btn" id="mb"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+
+<main>
+
+  <section class="hero-wrap" id="home">
+    <div class="hero reveal">
+      <div class="hero-eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">ONLINE · 创意空间站</span></div>
+      <h1><span data-i18n="hero.titlePre">欢迎来到</span> <span class="grad" data-i18n="hero.title">创意空间站</span></h1>
+      <p class="sub" data-i18n="hero.desc">融合游戏、创作与探索的现代化数字平台。体验丰富互动，编写实时代码，见证成长历程。</p>
+      <div class="emoji-row"><span>🎮</span><span>💻</span><span>📊</span></div>
+      <div class="hero-cta">
+        <button class="primary-btn" onclick="SM()"><span><i class="fas fa-play"></i> <span data-i18n="hero.start">立即开始</span></span></button>
+        <a class="ghost-btn" href="#features"><i class="fas fa-arrow-down"></i><span data-i18n="hero.more">了解更多</span></a>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-num">3+</div><div class="stat-label" data-i18n="stats.modules">核心模块</div></div>
+        <div class="stat"><div class="stat-num">24/7</div><div class="stat-label" data-i18n="stats.online">在线服务</div></div>
+        <div class="stat"><div class="stat-num">∞</div><div class="stat-label" data-i18n="stats.possible">无限可能</div></div>
+      </div>
+    </div>
+
+    <div class="badge-strip reveal">
+      <span class="badge"><i class="fas fa-bolt"></i> Fast</span>
+      <span class="badge"><i class="fas fa-palette"></i> Creative</span>
+      <span class="badge"><i class="fas fa-code"></i> Code Ready</span>
+      <span class="badge"><i class="fas fa-globe"></i> Multi-Lang</span>
+      <span class="badge"><i class="fas fa-moon"></i> Themeable</span>
+    </div>
+  </section>
+
+  <div class="container" id="features">
+    <div class="section-head reveal">
+      <span class="section-kicker" data-i18n="features.kicker">// MODULES</span>
+      <h2 class="section-title" data-i18n="features.title">核心<em>功能模块</em></h2>
+      <p class="section-sub" data-i18n="features.sub">从娱乐到创作，从记录到探索，每一个模块都经过精心打磨。</p>
+    </div>
+
+    <div class="module-list">
+
+      <!-- ROW 1 -->
+      <div class="module-row reveal">
+        <div class="card intro">
+          <div>
+            <span class="card-tag">MODULE · 01</span>
+            <div class="card-icon">🎮</div>
+            <h3 data-i18n="modules.0.title">游戏大厅</h3>
+            <p data-i18n="modules.0.desc">精心挑选的多款在线游戏，从休闲益智到动作冒险，总有一款适合你。体验流畅的操作和丰富的游戏内容，随时随地进行一场精彩的冒险。</p>
+            <ul class="feat-list">
+              <li><i class="fas fa-check"></i><span data-i18n="modules.0.f1">多品类游戏聚合</span></li>
+              <li><i class="fas fa-check"></i><span data-i18n="modules.0.f2">流畅操作手感</span></li>
+              <li><i class="fas fa-check"></i><span data-i18n="modules.0.f3">随时开玩无需等待</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card enter">
+          <div>
+            <span class="card-tag">ENTER</span>
+            <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+            <h3 data-i18n="modules.0.btnDesc">即刻畅玩</h3>
+            <p data-i18n="modules.0.btnPrompt">点击下方按钮，立即进入游戏大厅，开启你的游戏之旅！</p>
+          </div>
+          <button class="jump-btn" onclick="window.location.href='game.html'" data-i18n="modules.0.btnEnter">进入游戏大厅 <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="module-row reverse reveal">
+        <div class="card intro">
+          <div>
+            <span class="card-tag">MODULE · 02</span>
+            <div class="card-icon">💻</div>
+            <h3 data-i18n="modules.1.title">在线编辑器</h3>
+            <p data-i18n="modules.1.desc">实时编写和预览 HTML、CSS、JavaScript 代码，支持语法高亮、自动补全和一键保存到 GitHub。无论学习还是创作，这里都是你的理想工具。</p>
+            <ul class="feat-list">
+              <li><i class="fas fa-check"></i><span data-i18n="modules.1.f1">实时代码预览</span></li>
+              <li><i class="fas fa-check"></i><span data-i18n="modules.1.f2">语法高亮与补全</span></li>
+              <li><i class="fas fa-check"></i><span data-i18n="modules.1.f3">一键 GitHub 同步</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card enter">
+          <div>
+            <span class="card-tag">ENTER</span>
+            <div class="card-icon"><i class="fas fa-terminal"></i></div>
+            <h3 data-i18n="modules.1.btnDesc">在线编码</h3>
+            <p data-i18n="modules.1.btnPrompt">点击下方按钮，打开功能强大的在线编辑器，开始编写你的代码！</p>
+          </div>
+          <button class="jump-btn" onclick="window.location.href='code-editor.html'" data-i18n="modules.1.btnEnter"><i class="fas fa-arrow-left"></i> 打开代码编辑器</button>
+        </div>
+      </div>
+
+      <!-- ROW 3 -->
+      <div class="module-row reveal">
+        <div class="card intro">
+          <div>
+            <span class="card-tag">MODULE · 03</span>
+            <div class="card-icon">📊</div>
+            <h3 data-i18n="modules.2.title">建站历程</h3>
+            <p data-i18n="modules.2.desc">见证我们从零开始的成长轨迹，查看详细的运行时间、里程碑和版本迭代记录。了解创意空间站背后的故事与未来规划。</p>
+            <ul class="feat-list">
+              <li><i class="fas fa-check"></i><span data-i18n="modules.2.f1">完整的时间轴记录</span></li>
+              <li><i class="fas fa-check"></i><span data-i18n="modules.2.f2">里程碑与版本迭代</span></li>
+              <li><i class="fas fa-check"></i><span data-i18n="modules.2.f3">未来路线图</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card enter">
+          <div>
+            <span class="card-tag">ENTER</span>
+            <div class="card-icon"><i class="fas fa-history"></i></div>
+            <h3 data-i18n="modules.2.btnDesc">查看历程</h3>
+            <p data-i18n="modules.2.btnPrompt">点击下方按钮，探索我们的发展历程和未来计划！</p>
+          </div>
+          <button class="jump-btn" onclick="window.location.href='anniversary.html'" data-i18n="modules.2.btnEnter">查看建站时间 <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer" id="contact">
+  <p data-i18n="footer.line1">© 2024 创意空间站 · 由 FSYWED 创建与维护</p>
+  <p data-i18n="footer.line2">探索无限可能，创造属于你的数字世界</p>
+</footer>
+
+<div class="overlay" id="overlay" onclick="HA()"></div>
+
+<div class="login-modal" id="lm">
+  <div class="modal-header">
+    <h3 data-i18n="modal.title">🚀 访问登记</h3>
+    <span class="modal-close" onclick="HA()">×</span>
+  </div>
+  <div class="input-group"><input type="text" id="un" data-placeholder-i18n="modal.namePlaceholder" placeholder="你的名字（可选）"></div>
+  <div class="input-group"><textarea id="note" data-placeholder-i18n="modal.notePlaceholder" placeholder="留言（可选）"></textarea></div>
+  <div id="ls"></div>
+  <div class="modal-actions">
+    <button class="pill-btn" onclick="HA()" data-i18n="modal.cancel">取消</button>
+    <button class="primary-btn" onclick="SL()"><span data-i18n="modal.submit">登记并开始 →</span></button>
+  </div>
+</div>
+
 <script>
-const T={zh:{nav:{home:'首页',features:'功能模块',about:'关于',contact:'联系',login:'登录'},hero:{title:'创意空间站',desc:'融合游戏、创作与探索的现代化数字平台。体验丰富互动，编写实时代码，见证成长历程。'},features:{title:'核心功能模块'},modules:[{title:'游戏大厅',desc:'精心挑选的多款在线游戏，从休闲益智到动作冒险，总有一款适合你。体验流畅的操作和丰富的游戏内容，随时随地进行一场精彩的冒险。',btnDesc:'即刻畅玩',btnPrompt:'点击下方按钮，立即进入游戏大厅，开启你的游戏之旅！',btnEnter:'进入游戏大厅 →'},{title:'在线编辑器',desc:'实时编写和预览HTML、CSS、JavaScript代码，支持语法高亮、自动补全和一键保存到GitHub。无论学习还是创作，这里都是你的理想工具。',btnDesc:'在线编码',btnPrompt:'点击下方按钮，打开功能强大的在线编辑器，开始编写你的代码！',btnEnter:'← 打开代码编辑器'},{title:'建站历程',desc:'见证我们从零开始的成长轨迹，查看详细的运行时间、里程碑和版本迭代记录。了解创意空间站背后的故事与未来规划。',btnDesc:'查看历程',btnPrompt:'点击下方按钮，探索我们的发展历程和未来计划！',btnEnter:'查看建站时间 →'}],footer:{line1:'© 2024 创意空间站 · 由 FSYWED 创建与维护',line2:'探索无限可能，创造属于你的数字世界'},modal:{title:'访问登记',namePlaceholder:'你的名字（可选）',notePlaceholder:'留言（可选）',cancel:'取消',submit:'🚀 登记并开始'},status:{submitting:'提交中...',success:'成功！跳转中...',fail:'提交失败，直接跳转',networkError:'网络错误，直接跳转',tooLong:'留言过长'}},en:{nav:{home:'Home',features:'Features',about:'About',contact:'Contact',login:'Login'},hero:{title:'Creative Space Station',desc:'A modern digital platform integrating gaming, creation, and exploration. Experience rich interactions, write real-time code, and witness growth milestones.'},features:{title:'Core Features'},modules:[{title:'Game Hall',desc:'A variety of online games, from casual puzzles to action adventures. Experience smooth gameplay and rich content for exciting adventures anytime.',btnDesc:'Play Now',btnPrompt:'Click the button below to enter the game hall and start your journey!',btnEnter:'Enter Game Hall →'},{title:'Online Editor',desc:'Write and preview HTML, CSS, JavaScript code in real-time with syntax highlighting, autocomplete, and one-click GitHub save. Ideal for learning and creation.',btnDesc:'Code Online',btnPrompt:'Click below to open the powerful online editor and start coding!',btnEnter:'← Open Code Editor'},{title:'Site History',desc:'Witness our growth from scratch, view detailed uptime, milestones, and version history. Learn the story and future plans behind Creative Space Station.',btnDesc:'View History',btnPrompt:'Click below to explore our development journey and future plans!',btnEnter:'View Site Time →'}],footer:{line1:'© 2024 Creative Space Station · Created & Maintained by FSYWED',line2:'Explore Infinite Possibilities, Create Your Digital World'},modal:{title:'Access Registration',namePlaceholder:'Your name (optional)',notePlaceholder:'Message (optional)',cancel:'Cancel',submit:'🚀 Register & Start'},status:{submitting:'Submitting...',success:'Success! Redirecting...',fail:'Submit failed, redirecting...',networkError:'Network error, redirecting...',tooLong:'Message too long'}}};let L='zh',lb=document.querySelector('.lang-btn');function TL(){L=L==='zh'?'en':'zh';lb.textContent=L==='zh'?'EN':'中';UT()}function UT(){const t=T[L];document.title=t.hero.title;document.querySelectorAll('[data-i18n^="nav."]').forEach(e=>e.textContent=t.nav[e.getAttribute('data-i18n').split('.')[1]]);document.querySelector('[data-i18n="hero.title"]').textContent=t.hero.title;document.querySelector('[data-i18n="hero.desc"]').textContent=t.hero.desc;document.querySelector('[data-i18n="features.title"]').textContent=t.features.title;t.modules.forEach((m,i)=>{const ic=document.querySelector(`.intro-card[data-module="${i}"]`);if(ic){ic.querySelector('[data-i18n$=".title"]').textContent=m.title;ic.querySelector('[data-i18n$=".desc"]').textContent=m.desc}const ec=document.querySelectorAll('.enter-card');if(ec[i]){ec[i].querySelector('[data-i18n$=".btnDesc"]').textContent=m.btnDesc;ec[i].querySelector('[data-i18n$=".btnPrompt"]').textContent=m.btnPrompt;ec[i].querySelector('[data-i18n$=".btnEnter"]').textContent=m.btnEnter}});document.querySelector('[data-i18n="footer.line1"]').textContent=t.footer.line1;document.querySelector('[data-i18n="footer.line2"]').textContent=t.footer.line2;document.querySelector('[data-i18n="modal.title"]').textContent=t.modal.title;document.querySelector('[data-i18n="modal.cancel"]').textContent=t.modal.cancel;document.querySelector('[data-i18n="modal.submit"]').textContent=t.modal.submit;document.getElementById('un').placeholder=t.modal.namePlaceholder;document.getElementById('note').placeholder=t.modal.notePlaceholder}
+// ================ i18n ================
+const T = {
+  zh:{
+    nav:{home:'首页',features:'功能模块',about:'关于',contact:'联系',login:'登记进入'},
+    hero:{eyebrow:'ONLINE · 创意空间站',titlePre:'欢迎来到',title:'创意空间站',desc:'融合游戏、创作与探索的现代化数字平台。体验丰富互动，编写实时代码，见证成长历程。',start:'立即开始',more:'了解更多'},
+    stats:{modules:'核心模块',online:'在线服务',possible:'无限可能'},
+    features:{kicker:'// MODULES',title:'核心功能模块',sub:'从娱乐到创作，从记录到探索，每一个模块都经过精心打磨。'},
+    modules:[
+      {title:'游戏大厅',desc:'精心挑选的多款在线游戏，从休闲益智到动作冒险，总有一款适合你。体验流畅的操作和丰富的游戏内容，随时随地进行一场精彩的冒险。',f1:'多品类游戏聚合',f2:'流畅操作手感',f3:'随时开玩无需等待',btnDesc:'即刻畅玩',btnPrompt:'点击下方按钮，立即进入游戏大厅，开启你的游戏之旅！',btnEnter:'进入游戏大厅 →'},
+      {title:'在线编辑器',desc:'实时编写和预览 HTML、CSS、JavaScript 代码，支持语法高亮、自动补全和一键保存到 GitHub。无论学习还是创作，这里都是你的理想工具。',f1:'实时代码预览',f2:'语法高亮与补全',f3:'一键 GitHub 同步',btnDesc:'在线编码',btnPrompt:'点击下方按钮，打开功能强大的在线编辑器，开始编写你的代码！',btnEnter:'← 打开代码编辑器'},
+      {title:'建站历程',desc:'见证我们从零开始的成长轨迹，查看详细的运行时间、里程碑和版本迭代记录。了解创意空间站背后的故事与未来规划。',f1:'完整的时间轴记录',f2:'里程碑与版本迭代',f3:'未来路线图',btnDesc:'查看历程',btnPrompt:'点击下方按钮，探索我们的发展历程和未来计划！',btnEnter:'查看建站时间 →'}
+    ],
+    footer:{line1:'© 2024 创意空间站 · 由 FSYWED 创建与维护',line2:'探索无限可能，创造属于你的数字世界'},
+    modal:{title:'🚀 访问登记',namePlaceholder:'你的名字（可选）',notePlaceholder:'留言（可选）',cancel:'取消',submit:'登记并开始 →'},
+    status:{submitting:'提交中…',success:'成功！跳转中…',fail:'提交失败，直接跳转',networkError:'网络错误，直接跳转',tooLong:'留言过长，请精简后重试'}
+  },
+  en:{
+    nav:{home:'Home',features:'Modules',about:'About',contact:'Contact',login:'Enter'},
+    hero:{eyebrow:'ONLINE · Creative Station',titlePre:'Welcome to the',title:'Creative Station',desc:'A modern digital platform blending gaming, creation & exploration. Experience rich interactions, write live code, and witness our growth journey.',start:'Start Now',more:'Learn More'},
+    stats:{modules:'Core Modules',online:'Always Online',possible:'Infinite'},
+    features:{kicker:'// MODULES',title:'Core <em>Feature Modules</em>',sub:'From entertainment to creation, from records to exploration — every module is carefully polished.'},
+    modules:[
+      {title:'Game Hall',desc:'A curated collection of online games, from casual puzzles to action adventures. Experience smooth controls and rich content — embark on exciting adventures anytime.',f1:'Multi-genre aggregation',f2:'Smooth controls',f3:'Jump right in',btnDesc:'Play Now',btnPrompt:'Tap the button below to enter the game hall and start your journey!',btnEnter:'Enter Game Hall →'},
+      {title:'Online Editor',desc:'Write & preview HTML, CSS and JavaScript in real time, with syntax highlighting, autocomplete and one-click GitHub saves. Perfect for learning and creation.',f1:'Live preview',f2:'Syntax highlight & autocomplete',f3:'One-click GitHub sync',btnDesc:'Code Online',btnPrompt:'Tap below to launch the powerful online editor and start coding!',btnEnter:'← Open Code Editor'},
+      {title:'Site History',desc:'Witness our journey from scratch — browse detailed uptime, milestones and version iteration records. Discover the story behind Creative Station and our future plans.',f1:'Full timeline records',f2:'Milestones & versions',f3:'Future roadmap',btnDesc:'View History',btnPrompt:'Tap below to explore our development history and future plans!',btnEnter:'View Site History →'}
+    ],
+    footer:{line1:'© 2024 Creative Station · Created & maintained by FSYWED',line2:'Explore infinite possibilities — build your own digital world'},
+    modal:{title:'🚀 Visitor Check-in',namePlaceholder:'Your name (optional)',notePlaceholder:'Leave a message (optional)',cancel:'Cancel',submit:'Check in →'},
+    status:{submitting:'Submitting…',success:'Done! Redirecting…',fail:'Submit failed, redirecting anyway',networkError:'Network error, redirecting anyway',tooLong:'Message too long, please trim it'}
+  }
+};
 
-let CV=false;function TC(e){if(e)e.stopPropagation();const d=document.getElementById('cd');CV=!CV;d.style.display=CV?'flex':'none'}function SC(c1,c2,c3){document.documentElement.style.setProperty('--c1',c1);document.documentElement.style.setProperty('--c2',c2);document.documentElement.style.setProperty('--c3',c3);try{localStorage.setItem('theme',JSON.stringify({c1,c2,c3}))}catch(e){console.warn('保存失败')}HA();CV=false;document.getElementById('cd').style.display='none'}document.addEventListener('click',e=>{if(CV&&!e.target.closest('.color-toggle')&&!e.target.closest('#cd')){CV=false;document.getElementById('cd').style.display='none'}})
+let L = 'zh';
 
-function SM(){document.getElementById('lm').style.display='block';document.querySelector('.overlay').style.display='block';document.getElementById('ls').textContent=''}function HA(){document.getElementById('cd').style.display='none';document.getElementById('lm').style.display='none';document.querySelector('.overlay').style.display='none';CV=false}function SL(){const n=document.getElementById('un').value.trim(),t=document.getElementById('note').value.trim(),s=document.getElementById('ls'),st=T[L].status;if(t.length>500){s.textContent=st.tooLong;s.style.color='#dc3545';return}s.textContent=st.submitting;s.style.color='#FF416C';fetch('https://fsywed-github-lo-ylkz.vercel.app/api/save-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n||(L==='zh'?'匿名用户':'Anonymous'),message:t||(L==='zh'?'无留言':'No message'),timestamp:new Date().toISOString(),action:'user_registration',screenSize:screen.width+'x'+screen.height})}).then(r=>{if(r.ok){s.textContent=st.success;s.style.color='#28a745';setTimeout(()=>window.location.href='game.html',1500)}else{s.textContent=st.fail;s.style.color='#ffa726';setTimeout(()=>window.location.href='game.html',1000)}}).catch(()=>{s.textContent=st.networkError;s.style.color='#ffa726';setTimeout(()=>window.location.href='game.html',800)})}
+function applyI18n(){
+  const t = T[L];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    const parts = k.split('.');
+    let v = t;
+    for(const p of parts){
+      if(v == null) break;
+      if(/^\d+$/.test(p)) v = v[parseInt(p,10)]; else v = v[p];
+    }
+    if(typeof v === 'string'){
+      if(k.startsWith('features.title') || v.indexOf('<em>')>=0){ el.innerHTML = v; }
+      else { el.textContent = v; }
+    }
+  });
+  document.querySelectorAll('[data-placeholder-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-placeholder-i18n');
+    const parts = k.split('.');
+    let v = t;
+    for(const p of parts){ if(v==null) break; v = v[p]; }
+    if(typeof v === 'string') el.placeholder = v;
+  });
+  document.documentElement.lang = L === 'zh' ? 'zh-CN' : 'en';
+  document.getElementById('langLabel').textContent = L === 'zh' ? '中 / EN' : 'EN / 中';
+}
 
-window.addEventListener('load',()=>{try{const o=localStorage.getItem('theme');if(o){const c=JSON.parse(o);if(c.c1&&c.c2&&c.c3){SC(c.c1,c.c2,c.c3);return}}}catch(e){console.warn('加载失败')}SC('#1a2a6c','#b21f1f','#fdbb2d')})
-document.querySelector('.overlay').addEventListener('click',HA);document.addEventListener('keydown',e=>{if(e.key==='Escape')HA()})
+function TL(){ L = L === 'zh' ? 'en' : 'zh'; applyI18n(); }
 
-const mb=document.getElementById('mb'),nl=document.querySelector('.nav-links');mb.innerHTML='<i class="fas fa-bars"></i>';mb.addEventListener('click',()=>{nl.classList.toggle('active');mb.innerHTML=nl.classList.contains('active')?'<i class="fas fa-times"></i>':'<i class="fas fa-bars"></i>'})
-document.querySelectorAll('.nav-links a').forEach(l=>{l.addEventListener('click',e=>{const t=l.getAttribute('href');nl.classList.remove('active');mb.innerHTML='<i class="fas fa-bars"></i>';if(t.startsWith('#')){e.preventDefault();const el=document.querySelector(t);if(el)window.scrollTo({top:el.offsetTop-80,behavior:'smooth'})}})})
+// ================ THEMES ================
+let themeOpen = false;
+function TC(e){
+  if(e) e.stopPropagation();
+  const d = document.getElementById('cd');
+  themeOpen = !themeOpen;
+  d.style.display = themeOpen ? 'flex' : 'none';
+}
+function SC(c1,c2,c3){
+  document.documentElement.style.setProperty('--c1', c1);
+  document.documentElement.style.setProperty('--c2', c2);
+  document.documentElement.style.setProperty('--c3', c3);
+  try{ localStorage.setItem('theme', JSON.stringify({c1,c2,c3})); }catch(_){}
+  HA();
+  themeOpen = false;
+  document.getElementById('cd').style.display = 'none';
+}
+document.addEventListener('click', e=>{
+  if(themeOpen && !e.target.closest('.color-toggle') && !e.target.closest('#cd')){
+    themeOpen = false;
+    document.getElementById('cd').style.display = 'none';
+  }
+});
+
+// ================ MODAL ================
+function SM(){
+  document.getElementById('lm').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('ls').textContent = '';
+}
+function HA(){
+  document.getElementById('cd').style.display = 'none';
+  document.getElementById('lm').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+  themeOpen = false;
+}
+function SL(){
+  const n = document.getElementById('un').value.trim();
+  const msg = document.getElementById('note').value.trim();
+  const s = document.getElementById('ls');
+  const st = T[L].status;
+  if(msg.length > 500){ s.textContent = st.tooLong; s.style.color = '#ff89b5'; return; }
+  s.textContent = st.submitting; s.style.color = '#7bf1ff';
+  fetch('https://fsywed-github-lo-ylkz.vercel.app/api/save-message',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name: n || (L==='zh' ? '匿名用户' : 'Anonymous'),
+      message: msg || (L==='zh' ? '无留言' : 'No message'),
+      timestamp: new Date().toISOString(),
+      action:'user_registration',
+      screenSize: screen.width+'x'+screen.height
+    })
+  }).then(r=>{
+    if(r.ok){ s.textContent = st.success; s.style.color = '#7bf1ff'; setTimeout(()=>window.location.href='game.html', 1200); }
+    else{ s.textContent = st.fail; s.style.color = '#ffd166'; setTimeout(()=>window.location.href='game.html', 900); }
+  }).catch(()=>{
+    s.textContent = st.networkError; s.style.color = '#ffd166'; setTimeout(()=>window.location.href='game.html', 800);
+  });
+}
+
+// ================ INIT ================
+window.addEventListener('load', ()=>{
+  try{
+    const o = localStorage.getItem('theme');
+    if(o){
+      const c = JSON.parse(o);
+      if(c.c1 && c.c2 && c.c3){ SC(c.c1, c.c2, c.c3); return; }
+    }
+  }catch(_){}
+  SC('#0b0b3b','#3f1d7a','#f72585');
+});
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') HA(); });
+
+// Mobile menu
+const mb = document.getElementById('mb'), nl = document.getElementById('navLinks');
+mb.addEventListener('click', ()=>{
+  nl.classList.toggle('show');
+  mb.innerHTML = nl.classList.contains('show') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+});
+document.querySelectorAll('.nav-links a').forEach(l=>{
+  l.addEventListener('click', ()=>{
+    nl.classList.remove('show');
+    mb.innerHTML = '<i class="fas fa-bars"></i>';
+  });
+});
+
+// Reveal on scroll
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold: 0.12, rootMargin: '0px 0px -60px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// initial i18n pass
+applyI18n();
 </script>
 </body>
 </html>
