@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>代码编辑器 - VS Code</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.5.1/css/all.min.css" onerror="this.onerror=null;this.href='https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css'">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column;overflow:hidden}
@@ -343,10 +343,78 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
   </div>
 </div>
 
-<!-- Monaco Editor -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
-<!-- Pyodide for Python -->
-<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<!-- Monaco Editor (多CDN回退加载) -->
+<script>
+// CDN 源列表（按优先级排序，国内优先）
+const MONACO_CDNS = [
+  'https://cdn.staticfile.org/monaco-editor/0.44.0/min/vs',
+  'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.44.0/min/vs',
+  'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs',
+  'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs',
+  'https://unpkg.com/monaco-editor@0.44.0/min/vs'
+];
+const PYODIDE_CDNS = [
+  'https://cdn.bootcdn.net/ajax/libs/pyodide/0.24.1',
+  'https://cdn.jsdelivr.net/pyodide/v0.24.1/full',
+  'https://unpkg.com/pyodide@0.24.1/full'
+];
+
+// 动态加载脚本，支持回退
+function loadScriptWithFallback(urls, index) {
+  index = index || 0;
+  return new Promise((resolve, reject) => {
+    if (index >= urls.length) {
+      reject(new Error('所有CDN均加载失败'));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = urls[index];
+    script.onload = () => resolve(urls[index]);
+    script.onerror = () => {
+      console.warn('CDN加载失败，尝试下一个:', urls[index]);
+      loadScriptWithFallback(urls, index + 1).then(resolve).catch(reject);
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// 加载 Monaco loader
+window.__monacoBase = null;
+loadScriptWithFallback(MONACO_CDNS.map(u => u + '/loader.min.js'))
+  .then(() => {
+    // 找到成功的CDN，用于后续require.config
+    const successUrl = MONACO_CDNS.find(url => {
+      const scripts = document.querySelectorAll('script[src*="loader.min.js"]');
+      return Array.from(scripts).some(s => s.src.includes(url));
+    });
+    window.__monacoBase = successUrl || MONACO_CDNS[0];
+    console.log('Monaco loader 加载成功:', window.__monacoBase);
+  })
+  .catch(err => {
+    console.error('Monaco loader 全部加载失败:', err);
+    const loading = document.getElementById('loading');
+    if (loading) {
+      loading.innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器资源加载失败<br><small style="opacity:0.7;margin-top:10px;display:block">所有CDN均无法访问，请检查网络连接</small></div></div>';
+    }
+  });
+</script>
+<!-- Pyodide for Python (延迟加载) -->
+<script>
+// Pyodide 延迟加载，避免阻塞页面
+window.__pyodideBase = null;
+function loadPyodideScript() {
+  if (window.__pyodideBase) return Promise.resolve(window.__pyodideBase);
+  return loadScriptWithFallback(PYODIDE_CDNS.map(u => u + '/pyodide.js'))
+    .then(() => {
+      window.__pyodideBase = PYODIDE_CDNS.find(url => {
+        const scripts = document.querySelectorAll('script[src*="pyodide.js"]');
+        return Array.from(scripts).some(s => s.src.includes(url));
+      }) || PYODIDE_CDNS[0];
+      console.log('Pyodide 加载成功:', window.__pyodideBase);
+      return window.__pyodideBase;
+    });
+}
+</script>
 
 <script>
 // ===== 全局状态 =====
@@ -391,22 +459,28 @@ window.addEventListener('load', () => {
   document.getElementById('loading').classList.add('show');
   updateStatus('正在加载编辑器...');
   
-  // 添加加载超时处理（减少到15秒）
+  // 添加加载超时处理（30秒，给CDN回退足够时间）
   const loadingTimeout = setTimeout(() => {
     if (!monacoReady) {
       const loading = document.getElementById('loading');
-      loading.innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载超时<br><small style="opacity:0.7;margin-top:10px;display:block">请检查网络连接或刷新页面重试</small></div></div>';
+      loading.innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载超时<br><small style="opacity:0.7;margin-top:10px;display:block">所有CDN均无法访问，请检查网络连接或刷新页面重试</small></div></div>';
       updateStatus('加载失败');
     }
-  }, 15000);
+  }, 30000);
   
-  // 延迟初始化 Monaco Editor（确保 DOM 完全加载）
-  setTimeout(() => {
+  // 等待 Monaco loader 加载完成后再初始化
+  function initMonaco() {
+    if (typeof require === 'undefined') {
+      // loader 还未加载，继续等待
+      setTimeout(initMonaco, 200);
+      return;
+    }
+    
     try {
+      // 使用成功加载的CDN路径
+      const vsPath = window.__monacoBase || MONACO_CDNS[0];
       require.config({ 
-        paths: { 
-          vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'
-        } 
+        paths: { vs: vsPath }
       });
       
       require(['vs/editor/editor.main'], function () {
@@ -453,9 +527,6 @@ window.addEventListener('load', () => {
           // 运行初始代码
           runWeb(examples.html);
           
-          // 延迟初始化 Pyodide（避免阻塞）
-          setTimeout(() => initPyodide(), 2000);
-          
           updateStatus('就绪');
           
         } catch (e) {
@@ -470,7 +541,10 @@ window.addEventListener('load', () => {
       document.getElementById('loading').innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载失败<br><small style="opacity:0.7;margin-top:10px;display:block">无法加载编辑器组件</small></div></div>';
       updateStatus('加载失败');
     }
-  }, 100);
+  }
+  
+  // 延迟启动初始化
+  setTimeout(initMonaco, 300);
 });
 
 // ===== 初始化 Pyodide =====
@@ -480,8 +554,14 @@ async function initPyodide() {
   
   try {
     addTerminalLine('正在加载 Python 运行环境 (Pyodide)...');
+    
+    // 先加载 Pyodide 脚本（多CDN回退）
+    await loadPyodideScript();
+    
+    // 使用成功加载的CDN路径初始化
+    const pyodideBase = window.__pyodideBase || PYODIDE_CDNS[0];
     pyodide = await loadPyodide({
-      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
+      indexURL: pyodideBase + '/'
     });
     addTerminalLine('✓ Python 运行环境加载完成');
     pyodideLoading = false;
@@ -529,6 +609,11 @@ function setLang(lang) {
   
   // 更新状态栏
   document.getElementById('status-lang').textContent = config.name;
+  
+  // 切换到 Python 时触发 Pyodide 加载
+  if (lang === 'python' && !pyodide && !pyodideLoading) {
+    initPyodide();
+  }
   
   // 运行代码
   runCode();
