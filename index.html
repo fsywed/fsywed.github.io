@@ -277,19 +277,18 @@ body::after{
 /* ---------- MODULE CARDS ---------- */
 .module-list{display:flex;flex-direction:column;gap:2.5rem}
 
-.module-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:stretch;
-}
-.module-row.reverse{direction:rtl}
-.module-row.reverse > *{direction:ltr}
+.module-row{display:block}
 
 .card{
-  background:linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+  background:
+    radial-gradient(ellipse at top right, rgba(76,201,240,0.12), transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(247,37,133,0.12), transparent 50%),
+    linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
   border:1px solid var(--glass-stroke);
   border-radius:24px;padding:2.2rem;position:relative;overflow:hidden;
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s;
-  min-height:280px;display:flex;flex-direction:column;justify-content:space-between;
+  display:grid;grid-template-columns:1.3fr 1fr;gap:2rem;align-items:center;
 }
 .card:hover{
   transform:translateY(-6px);
@@ -301,23 +300,22 @@ body::after{
   background:linear-gradient(90deg, transparent, var(--pc), var(--sc), transparent);
   opacity:.6;
 }
-.card.intro{
-  background:
-    radial-gradient(ellipse at top right, rgba(76,201,240,0.15), transparent 50%),
-    linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+
+.card-left{position:relative;z-index:1}
+.card-right{
+  position:relative;z-index:1;
+  padding:1.8rem;border-radius:18px;
+  background:linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.12);
+  text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;
 }
-.card.enter{
-  background:
-    radial-gradient(ellipse at bottom left, rgba(247,37,133,0.18), transparent 50%),
-    linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
-}
+
 .card-tag{
   display:inline-block;padding:4px 12px;border-radius:999px;
   background:rgba(76,201,240,0.18);border:1px solid rgba(76,201,240,0.4);
   color:#4cc9f0;font-size:0.72rem;letter-spacing:2px;
   font-family:'JetBrains Mono',monospace;margin-bottom:1rem;text-transform:uppercase;
 }
-.card.enter .card-tag{background:rgba(247,37,133,0.18);border-color:rgba(247,37,133,0.4);color:#ff89b5}
 
 .card-icon{
   width:64px;height:64px;border-radius:20px;
@@ -327,35 +325,31 @@ body::after{
   font-size:2rem;margin-bottom:1.2rem;
   box-shadow:inset 0 0 20px rgba(76,201,240,0.15);
 }
-.card.enter .card-icon{
+.card-right .card-icon{
+  width:56px;height:56px;border-radius:16px;font-size:1.6rem;margin-bottom:0;
   background:linear-gradient(135deg, rgba(247,37,133,0.2), rgba(255,209,102,0.2));
   box-shadow:inset 0 0 20px rgba(247,37,133,0.15);
 }
 
 .card h3{font-size:1.6rem;font-weight:800;margin-bottom:0.8rem;color:#fff;letter-spacing:-0.3px}
 .card p{color:rgba(255,255,255,0.72);font-size:0.98rem;line-height:1.75;margin-bottom:1.5rem}
+.card-right h4{font-size:1.15rem;font-weight:700;color:#fff;margin:0.3rem 0 0.2rem}
+.card-right p{font-size:0.85rem;color:rgba(255,255,255,0.65);margin:0 0 0.8rem;line-height:1.6}
 
 .feat-list{list-style:none;display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem}
 .feat-list li{color:rgba(255,255,255,0.78);font-size:0.9rem;display:flex;align-items:center;gap:10px}
 .feat-list li i{color:var(--pc);font-size:0.75rem;width:14px}
-.card.enter .feat-list li i{color:var(--ac)}
 
 .jump-btn{
-  align-self:flex-start;
-  background:linear-gradient(135deg,var(--pc),#7bf1ff);
-  color:#0b0b3b;border:none;padding:12px 22px;
+  background:linear-gradient(135deg,var(--sc),#ff89b5);color:#fff;
+  border:none;padding:12px 22px;
   border-radius:12px;cursor:pointer;font-weight:700;
   font-size:0.92rem;transition:all .3s;
   display:inline-flex;align-items:center;gap:10px;
-  box-shadow:0 10px 24px rgba(76,201,240,0.35);
+  box-shadow:0 10px 24px rgba(247,37,133,0.4);
   font-family:'Noto Sans SC',sans-serif;
 }
-.jump-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 30px rgba(76,201,240,0.5)}
-.card.enter .jump-btn{
-  background:linear-gradient(135deg,var(--sc),#ff89b5);color:#fff;
-  box-shadow:0 10px 24px rgba(247,37,133,0.4);
-}
-.card.enter .jump-btn:hover{box-shadow:0 14px 30px rgba(247,37,133,0.55)}
+.jump-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 30px rgba(247,37,133,0.55)}
 
 /* ---------- FOOTER ---------- */
 .footer{
@@ -439,13 +433,12 @@ body::after{
   .nav-links.show{display:flex}
   .mobile-menu-btn{display:flex}
   .hero{padding:3.5rem 1.5rem}
-  .module-row{grid-template-columns:1fr;gap:1rem}
-  .module-row.reverse{direction:ltr}
   .top-right{gap:8px}
   .pill-btn{padding:6px 12px;font-size:0.78rem}
   .primary-btn{padding:8px 14px;font-size:0.85rem}
   .stats-row{gap:1.8rem}
-  .card{padding:1.6rem;min-height:auto}
+  .card{grid-template-columns:1fr;padding:1.6rem;gap:1.2rem}
+  .card-right{padding:1.3rem}
 }
 </style>
 </head>
@@ -513,10 +506,10 @@ body::after{
 
     <div class="module-list">
 
-      <!-- ROW 1 -->
+      <!-- MODULE 01 -->
       <div class="module-row reveal">
-        <div class="card intro">
-          <div>
+        <div class="card">
+          <div class="card-left">
             <span class="card-tag">MODULE · 01</span>
             <div class="card-icon">🎮</div>
             <h3 data-i18n="modules.0.title">游戏大厅</h3>
@@ -527,22 +520,19 @@ body::after{
               <li><i class="fas fa-check"></i><span data-i18n="modules.0.f3">随时开玩无需等待</span></li>
             </ul>
           </div>
-        </div>
-        <div class="card enter">
-          <div>
-            <span class="card-tag">ENTER</span>
+          <div class="card-right">
             <div class="card-icon"><i class="fas fa-gamepad"></i></div>
-            <h3 data-i18n="modules.0.btnDesc">即刻畅玩</h3>
+            <h4 data-i18n="modules.0.btnDesc">即刻畅玩</h4>
             <p data-i18n="modules.0.btnPrompt">点击下方按钮，立即进入游戏大厅，开启你的游戏之旅！</p>
+            <button class="jump-btn" onclick="window.location.href='game.html'" data-i18n="modules.0.btnEnter">进入游戏大厅 <i class="fas fa-arrow-right"></i></button>
           </div>
-          <button class="jump-btn" onclick="window.location.href='game.html'" data-i18n="modules.0.btnEnter">进入游戏大厅 <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- ROW 2 -->
-      <div class="module-row reverse reveal">
-        <div class="card intro">
-          <div>
+      <!-- MODULE 02 -->
+      <div class="module-row reveal">
+        <div class="card">
+          <div class="card-left">
             <span class="card-tag">MODULE · 02</span>
             <div class="card-icon">💻</div>
             <h3 data-i18n="modules.1.title">在线编辑器</h3>
@@ -553,22 +543,19 @@ body::after{
               <li><i class="fas fa-check"></i><span data-i18n="modules.1.f3">一键 GitHub 同步</span></li>
             </ul>
           </div>
-        </div>
-        <div class="card enter">
-          <div>
-            <span class="card-tag">ENTER</span>
+          <div class="card-right">
             <div class="card-icon"><i class="fas fa-terminal"></i></div>
-            <h3 data-i18n="modules.1.btnDesc">在线编码</h3>
+            <h4 data-i18n="modules.1.btnDesc">在线编码</h4>
             <p data-i18n="modules.1.btnPrompt">点击下方按钮，打开功能强大的在线编辑器，开始编写你的代码！</p>
+            <button class="jump-btn" onclick="window.location.href='code-editor.html'" data-i18n="modules.1.btnEnter">打开代码编辑器 <i class="fas fa-arrow-right"></i></button>
           </div>
-          <button class="jump-btn" onclick="window.location.href='code-editor.html'" data-i18n="modules.1.btnEnter"><i class="fas fa-arrow-left"></i> 打开代码编辑器</button>
         </div>
       </div>
 
-      <!-- ROW 3 -->
+      <!-- MODULE 03 -->
       <div class="module-row reveal">
-        <div class="card intro">
-          <div>
+        <div class="card">
+          <div class="card-left">
             <span class="card-tag">MODULE · 03</span>
             <div class="card-icon">📊</div>
             <h3 data-i18n="modules.2.title">建站历程</h3>
@@ -579,15 +566,12 @@ body::after{
               <li><i class="fas fa-check"></i><span data-i18n="modules.2.f3">未来路线图</span></li>
             </ul>
           </div>
-        </div>
-        <div class="card enter">
-          <div>
-            <span class="card-tag">ENTER</span>
+          <div class="card-right">
             <div class="card-icon"><i class="fas fa-history"></i></div>
-            <h3 data-i18n="modules.2.btnDesc">查看历程</h3>
+            <h4 data-i18n="modules.2.btnDesc">查看历程</h4>
             <p data-i18n="modules.2.btnPrompt">点击下方按钮，探索我们的发展历程和未来计划！</p>
+            <button class="jump-btn" onclick="window.location.href='anniversary.html'" data-i18n="modules.2.btnEnter">查看建站时间 <i class="fas fa-arrow-right"></i></button>
           </div>
-          <button class="jump-btn" onclick="window.location.href='anniversary.html'" data-i18n="modules.2.btnEnter">查看建站时间 <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
