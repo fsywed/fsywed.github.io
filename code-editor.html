@@ -659,51 +659,100 @@ function runWeb(code) {
 // ===== 运行 Python =====
 async function runPython(code) {
   showPanel('output');
-  
-  if (!pyodide) {
-    if (pyodideLoading) {
-      showOutput('<div class="out-info"><i class="fa-solid fa-spinner fa-spin"></i> Python 运行环境加载中，请稍候...</div>');
-    } else {
-      showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> Python 运行环境未加载</div><div class="out-info">请刷新页面重试</div>');
-    }
-    return;
-  }
-  
   showOutput('<div class="out-info"><i class="fa-solid fa-spinner fa-spin"></i> 正在运行 Python 代码...</div>');
   
+  // 方案1: Judge0 CE API (免费公共实例)
   try {
-    // 重定向 stdout 和 stderr
-    pyodide.runPython(`
+    const response = await fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source_code: code,
+        language_id: 71,
+        stdin: '',
+        cpu_time_limit: 5,
+        memory_limit: 128000
+      })
+    });
+    
+    if (!response.ok) throw new Error('Judge0 返回 HTTP ' + response.status);
+    
+    const data = await response.json();
+    
+    let output = '<div class="out-meta">Python (Judge0 CE) | 状态: ' + (data.status?.description || '未知') + '</div>';
+    if (data.compile_output) {
+      output += '<div class="out-err">[编译错误]\n' + escapeHtml(data.compile_output) + '</div>';
+    }
+    if (data.stdout) output += '<div class="out-ok">' + escapeHtml(data.stdout) + '</div>';
+    if (data.stderr) output += '<div class="out-err">' + escapeHtml(data.stderr) + '</div>';
+    if (!data.stdout && !data.stderr && !data.compile_output) {
+      output += '<div class="out-info">(程序无输出)</div>';
+    }
+    
+    showOutput(output);
+    updateStatus('Python 运行完成');
+    return;
+  } catch (e) {
+    console.warn('Judge0 CE 失败:', e.message);
+  }
+  
+  // 方案2: Vercel 代理
+  try {
+    const response = await fetch('/api/run-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: 'python', code: code })
+    });
+    
+    if (!response.ok) throw new Error('服务器返回 HTTP ' + response.status);
+    const data = await response.json();
+    
+    let output = '<div class="out-meta">Python (Vercel 代理) | 退出码: ' + (data.run?.code || '?') + '</div>';
+    if (data.compile?.stderr) output += '<div class="out-err">[编译错误]\n' + escapeHtml(data.compile.stderr) + '</div>';
+    if (data.run?.stdout) output += '<div class="out-ok">' + escapeHtml(data.run.stdout) + '</div>';
+    if (data.run?.stderr) output += '<div class="out-err">' + escapeHtml(data.run.stderr) + '</div>';
+    if (!data.run?.stdout && !data.run?.stderr && !data.compile?.stderr) output += '<div class="out-info">(程序无输出)</div>';
+    
+    showOutput(output);
+    updateStatus('Python 运行完成');
+    return;
+  } catch (e) {
+    console.warn('Vercel 代理失败:', e.message);
+  }
+  
+  // 方案3: Pyodide 浏览器端运行
+  if (pyodide) {
+    try {
+      pyodide.runPython(`
 import sys
 from io import StringIO
 sys.stdout = StringIO()
 sys.stderr = StringIO()
-    `);
-    
-    // 运行用户代码
-    await pyodide.runPythonAsync(code);
-    
-    // 获取输出
-    const stdout = pyodide.runPython('sys.stdout.getvalue()');
-    const stderr = pyodide.runPython('sys.stderr.getvalue()');
-    
-    // 重置 stdout/stderr
-    pyodide.runPython(`
+      `);
+      await pyodide.runPythonAsync(code);
+      const stdout = pyodide.runPython('sys.stdout.getvalue()');
+      const stderr = pyodide.runPython('sys.stderr.getvalue()');
+      pyodide.runPython(`
 sys.stdout = sys.__stdout__
 sys.stderr = sys.__stderr__
-    `);
-    
-    let output = '<div class="out-meta">Python (Pyodide) | 浏览器端运行</div>';
-    if (stdout) output += '<div class="out-ok">' + escapeHtml(stdout) + '</div>';
-    if (stderr) output += '<div class="out-err">' + escapeHtml(stderr) + '</div>';
-    if (!stdout && !stderr) output += '<div class="out-info">(程序无输出)</div>';
-    
-    showOutput(output);
-    updateStatus('Python 运行完成');
-  } catch (e) {
-    showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行错误</div><div class="out-err">' + escapeHtml(e.message) + '</div>');
-    updateStatus('Python 运行失败');
+      `);
+      
+      let output = '<div class="out-meta">Python (Pyodide) | 浏览器端运行</div>';
+      if (stdout) output += '<div class="out-ok">' + escapeHtml(stdout) + '</div>';
+      if (stderr) output += '<div class="out-err">' + escapeHtml(stderr) + '</div>';
+      if (!stdout && !stderr) output += '<div class="out-info">(程序无输出)</div>';
+      
+      showOutput(output);
+      updateStatus('Python 运行完成');
+      return;
+    } catch (e) {
+      console.warn('Pyodide 失败:', e.message);
+    }
   }
+  
+  // 所有方案都失败
+  showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行失败</div><div class="out-info">所有编译服务均不可用，请检查网络连接后刷新页面重试</div>');
+  updateStatus('Python 运行失败');
 }
 
 // ===== 运行 C++ =====
@@ -711,8 +760,43 @@ async function runCpp(code) {
   showPanel('output');
   showOutput('<div class="out-info"><i class="fa-solid fa-spinner fa-spin"></i> 正在编译运行 C++ 代码...</div>');
   
+  // 方案1: Judge0 CE API (免费公共实例)
   try {
-    // 尝试使用 Vercel 代理
+    const response = await fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source_code: code,
+        language_id: 54,
+        stdin: '',
+        cpu_time_limit: 5,
+        memory_limit: 128000
+      })
+    });
+    
+    if (!response.ok) throw new Error('Judge0 返回 HTTP ' + response.status);
+    
+    const data = await response.json();
+    
+    let output = '<div class="out-meta">C++ (Judge0 CE) | 状态: ' + (data.status?.description || '未知') + '</div>';
+    if (data.compile_output) {
+      output += '<div class="out-err">[编译错误]\n' + escapeHtml(data.compile_output) + '</div>';
+    }
+    if (data.stdout) output += '<div class="out-ok">' + escapeHtml(data.stdout) + '</div>';
+    if (data.stderr) output += '<div class="out-err">' + escapeHtml(data.stderr) + '</div>';
+    if (!data.stdout && !data.stderr && !data.compile_output) {
+      output += '<div class="out-info">(程序无输出)</div>';
+    }
+    
+    showOutput(output);
+    updateStatus('C++ 运行完成');
+    return;
+  } catch (e) {
+    console.warn('Judge0 CE 失败:', e.message);
+  }
+  
+  // 方案2: Vercel 代理
+  try {
     const response = await fetch('/api/run-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -735,40 +819,47 @@ async function runCpp(code) {
     
     showOutput(output);
     updateStatus('C++ 运行完成');
+    return;
   } catch (e) {
-    // 回退到 Piston API
-    try {
-      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: 'c++',
-          version: '10.2.0',
-          files: [{ name: 'main.cpp', content: code }]
-        })
-      });
-      
-      if (!response.ok) throw new Error('Piston API 返回 HTTP ' + response.status);
-      
-      const data = await response.json();
-      
-      let output = '<div class="out-meta">C++ (Piston API) | 退出码: ' + (data.run?.code || '?') + '</div>';
-      if (data.compile?.stderr) {
-        output += '<div class="out-err">[编译错误]\n' + escapeHtml(data.compile.stderr) + '</div>';
-      }
-      if (data.run?.stdout) output += '<div class="out-ok">' + escapeHtml(data.run.stdout) + '</div>';
-      if (data.run?.stderr) output += '<div class="out-err">' + escapeHtml(data.run.stderr) + '</div>';
-      if (!data.run?.stdout && !data.run?.stderr && !data.compile?.stderr) {
-        output += '<div class="out-info">(程序无输出)</div>';
-      }
-      
-      showOutput(output);
-      updateStatus('C++ 运行完成');
-    } catch (e2) {
-      showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行失败</div><div class="out-err">' + escapeHtml(e2.message) + '</div><div class="out-info"><i class="fa-solid fa-lightbulb"></i> 提示: C++ 编译需要网络连接，请检查网络设置</div>');
-      updateStatus('C++ 运行失败');
-    }
+    console.warn('Vercel 代理失败:', e.message);
   }
+  
+  // 方案3: Piston API (回退)
+  try {
+    const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: 'c++',
+        version: '10.2.0',
+        files: [{ name: 'main.cpp', content: code }]
+      })
+    });
+    
+    if (!response.ok) throw new Error('Piston API 返回 HTTP ' + response.status);
+    
+    const data = await response.json();
+    
+    let output = '<div class="out-meta">C++ (Piston API) | 退出码: ' + (data.run?.code || '?') + '</div>';
+    if (data.compile?.stderr) {
+      output += '<div class="out-err">[编译错误]\n' + escapeHtml(data.compile.stderr) + '</div>';
+    }
+    if (data.run?.stdout) output += '<div class="out-ok">' + escapeHtml(data.run.stdout) + '</div>';
+    if (data.run?.stderr) output += '<div class="out-err">' + escapeHtml(data.run.stderr) + '</div>';
+    if (!data.run?.stdout && !data.run?.stderr && !data.compile?.stderr) {
+      output += '<div class="out-info">(程序无输出)</div>';
+    }
+    
+    showOutput(output);
+    updateStatus('C++ 运行完成');
+    return;
+  } catch (e) {
+    console.warn('Piston API 失败:', e.message);
+  }
+  
+  // 所有方案都失败
+  showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行失败</div><div class="out-info">所有编译服务均不可用，请检查网络连接后刷新页面重试</div>');
+  updateStatus('C++ 运行失败');
 }
 
 // ===== 辅助函数 =====
