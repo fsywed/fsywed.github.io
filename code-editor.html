@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>代码编辑器 - VS Code</title>
-<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.5.1/css/all.min.css" onerror="this.onerror=null;this.href='https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;height:100vh;display:flex;flex-direction:column;overflow:hidden}
@@ -18,9 +18,28 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 .titlebar-btn:hover{background:#505050;color:#fff}
 
 /* 菜单栏 */
-.menubar{background:#252526;padding:0 10px;height:30px;display:flex;align-items:center;gap:16px;font-size:13px;flex-shrink:0;border-bottom:1px solid #1e1e1e}
-.menu-item{color:#ccc;cursor:pointer;padding:4px 8px;border-radius:3px}
+.menubar{background:#252526;padding:0 10px;height:30px;display:flex;align-items:center;gap:16px;font-size:13px;flex-shrink:0;border-bottom:1px solid #1e1e1e;position:relative;z-index:100}
+.menu-item{color:#ccc;cursor:pointer;padding:4px 8px;border-radius:3px;position:relative}
 .menu-item:hover{background:#505050}
+
+/* 下拉菜单 */
+.dropdown-menu{
+  display:none;position:absolute;top:100%;left:0;min-width:220px;
+  background:#252526;border:1px solid #454545;border-radius:4px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.5);padding:4px 0;z-index:1000;
+  margin-top:2px;
+}
+.dropdown-menu.show{display:block}
+.menu-option{
+  padding:6px 16px;color:#ccc;cursor:pointer;display:flex;align-items:center;gap:10px;
+  font-size:13px;transition:background 0.15s;
+}
+.menu-option:hover{background:#094771;color:#fff}
+.menu-option i{width:16px;text-align:center;font-size:12px;color:#858585}
+.menu-option:hover i{color:#fff}
+.menu-option .shortcut{margin-left:auto;font-size:11px;color:#858585}
+.menu-option:hover .shortcut{color:#ccc}
+.menu-separator{height:1px;background:#454545;margin:4px 0}
 
 /* 主容器 */
 .main{display:flex;flex:1;overflow:hidden}
@@ -34,6 +53,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 
 /* 侧边栏 */
 .sidebar{width:240px;background:#252526;border-right:1px solid #1e1e1e;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-panel{display:flex;flex-direction:column;flex:1;overflow:hidden}
 .sidebar-header{padding:8px 16px;font-size:11px;text-transform:uppercase;color:#bbb;letter-spacing:0.5px;display:flex;justify-content:space-between;align-items:center}
 .sidebar-content{flex:1;overflow-y:auto;padding:4px 0}
 .sidebar-section{margin-bottom:16px}
@@ -170,13 +190,88 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 
 <!-- 菜单栏 -->
 <div class="menubar">
-  <span class="menu-item">文件</span>
-  <span class="menu-item">编辑</span>
-  <span class="menu-item">选择</span>
-  <span class="menu-item">查看</span>
-  <span class="menu-item">运行</span>
-  <span class="menu-item">终端</span>
-  <span class="menu-item">帮助</span>
+  <div class="menu-item" onclick="toggleMenu('file-menu')">
+    文件
+    <div class="dropdown-menu" id="file-menu">
+      <div class="menu-option" onclick="newFile()"><i class="fa-solid fa-file"></i> 新建文件</div>
+      <div class="menu-option" onclick="saveToLocalStorage()"><i class="fa-solid fa-floppy-disk"></i> 保存 <span class="shortcut">Ctrl+S</span></div>
+      <div class="menu-option" onclick="loadFromLocalStorage()"><i class="fa-solid fa-folder-open"></i> 打开</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="downloadCode()"><i class="fa-solid fa-download"></i> 下载代码</div>
+      <div class="menu-option" onclick="openGitHubDlg()"><i class="fa-brands fa-github"></i> 提交到 GitHub</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleMenu('edit-menu')">
+    编辑
+    <div class="dropdown-menu" id="edit-menu">
+      <div class="menu-option" onclick="editorAction('undo')"><i class="fa-solid fa-rotate-left"></i> 撤销 <span class="shortcut">Ctrl+Z</span></div>
+      <div class="menu-option" onclick="editorAction('redo')"><i class="fa-solid fa-rotate-right"></i> 重做 <span class="shortcut">Ctrl+Y</span></div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="editorAction('cut')"><i class="fa-solid fa-scissors"></i> 剪切 <span class="shortcut">Ctrl+X</span></div>
+      <div class="menu-option" onclick="editorAction('copy')"><i class="fa-solid fa-copy"></i> 复制 <span class="shortcut">Ctrl+C</span></div>
+      <div class="menu-option" onclick="editorAction('paste')"><i class="fa-solid fa-paste"></i> 粘贴 <span class="shortcut">Ctrl+V</span></div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="editorAction('selectAll')"><i class="fa-solid fa-object-group"></i> 全选 <span class="shortcut">Ctrl+A</span></div>
+      <div class="menu-option" onclick="formatCode()"><i class="fa-solid fa-align-left"></i> 格式化代码</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleMenu('select-menu')">
+    选择
+    <div class="dropdown-menu" id="select-menu">
+      <div class="menu-option" onclick="editorAction('selectAll')"><i class="fa-solid fa-object-group"></i> 全选 <span class="shortcut">Ctrl+A</span></div>
+      <div class="menu-option" onclick="editorAction('expandSelection')"><i class="fa-solid fa-expand"></i> 扩展选择</div>
+      <div class="menu-option" onclick="editorAction('shrinkSelection')"><i class="fa-solid fa-compress"></i> 收缩选择</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="editorAction('selectLine')"><i class="fa-solid fa-bars"></i> 选择当前行</div>
+      <div class="menu-option" onclick="editorAction('selectWord')"><i class="fa-solid fa-font"></i> 选择当前单词</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleMenu('view-menu')">
+    查看
+    <div class="dropdown-menu" id="view-menu">
+      <div class="menu-option" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i> 切换侧边栏</div>
+      <div class="menu-option" onclick="toggleTerminal()"><i class="fa-solid fa-terminal"></i> 切换终端</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="editorAction('zoomIn')"><i class="fa-solid fa-magnifying-glass-plus"></i> 放大 <span class="shortcut">Ctrl++</span></div>
+      <div class="menu-option" onclick="editorAction('zoomOut')"><i class="fa-solid fa-magnifying-glass-minus"></i> 缩小 <span class="shortcut">Ctrl+-</span></div>
+      <div class="menu-option" onclick="editorAction('resetZoom')"><i class="fa-solid fa-arrows-rotate"></i> 重置缩放</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="editorAction('toggleMinimap')"><i class="fa-solid fa-map"></i> 切换小地图</div>
+      <div class="menu-option" onclick="editorAction('toggleWordWrap')"><i class="fa-solid fa-text-width"></i> 切换自动换行</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleMenu('run-menu')">
+    运行
+    <div class="dropdown-menu" id="run-menu">
+      <div class="menu-option" onclick="runCode()"><i class="fa-solid fa-play"></i> 运行代码 <span class="shortcut">F5</span></div>
+      <div class="menu-option" onclick="loadExample()"><i class="fa-solid fa-wand-magic-sparkles"></i> 加载示例</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="setLang('html')"><i class="fa-brands fa-html5"></i> HTML</div>
+      <div class="menu-option" onclick="setLang('css')"><i class="fa-brands fa-css3-alt"></i> CSS</div>
+      <div class="menu-option" onclick="setLang('js')"><i class="fa-brands fa-js"></i> JavaScript</div>
+      <div class="menu-option" onclick="setLang('python')"><i class="fa-brands fa-python"></i> Python</div>
+      <div class="menu-option" onclick="setLang('cpp')"><i class="fa-solid fa-hashtag"></i> C++</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleMenu('terminal-menu')">
+    终端
+    <div class="dropdown-menu" id="terminal-menu">
+      <div class="menu-option" onclick="toggleTerminal()"><i class="fa-solid fa-terminal"></i> 新建终端</div>
+      <div class="menu-option" onclick="runCode()"><i class="fa-solid fa-play"></i> 运行当前文件</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="terminalCommand('clear')"><i class="fa-solid fa-broom"></i> 清除终端</div>
+      <div class="menu-option" onclick="terminalCommand('help')"><i class="fa-solid fa-circle-question"></i> 终端帮助</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleMenu('help-menu')">
+    帮助
+    <div class="dropdown-menu" id="help-menu">
+      <div class="menu-option" onclick="showAbout()"><i class="fa-solid fa-circle-info"></i> 关于</div>
+      <div class="menu-option" onclick="showShortcuts()"><i class="fa-solid fa-keyboard"></i> 快捷键</div>
+      <div class="menu-separator"></div>
+      <div class="menu-option" onclick="window.open('https://github.com','_blank')"><i class="fa-brands fa-github"></i> GitHub</div>
+    </div>
+  </div>
 </div>
 
 <!-- 主容器 -->
@@ -398,11 +493,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
   </div>
   <div class="terminal-body" id="terminal-body">
     <div class="terminal-line"><span class="terminal-prompt">$</span> 欢迎使用代码编辑器终端</div>
-    <div class="terminal-line"><span class="terminal-prompt">$</span> 支持语言: HTML, CSS, JS, Python, C++</div>
-    <div class="terminal-line" style="display:flex">
-      <span class="terminal-prompt">$</span>
-      <input type="text" class="terminal-input" id="terminal-input" placeholder="输入命令..." onkeydown="if(event.key==='Enter')executeCommand()">
-    </div>
   </div>
 </div>
 
@@ -411,114 +501,43 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
   <div class="statusbar-left">
     <div class="statusbar-item"><i class="fa-solid fa-code-branch"></i> main</div>
     <div class="statusbar-item"><i class="fa-solid fa-circle-check"></i> 0 问题</div>
-    <div class="statusbar-item" id="status-lang">HTML</div>
   </div>
   <div class="statusbar-right">
     <div class="statusbar-item" id="status-line">行 1, 列 1</div>
     <div class="statusbar-item">UTF-8</div>
-    <div class="statusbar-item" id="status-time"></div>
+    <div class="statusbar-item" id="status-lang">HTML</div>
+    <div class="statusbar-item" id="status">就绪</div>
   </div>
 </div>
 
-<!-- 对话框 -->
+<!-- GitHub 提交对话框 -->
 <div class="overlay" id="overlay" onclick="closeDialog()"></div>
 <div id="dialog">
   <div class="dlg-head">
-    <h3><i class="fa-brands fa-github"></i> 提交到 GitHub</h3>
-    <button class="dlg-close" onclick="closeDialog()">×</button>
+    <h3>提交到 GitHub</h3>
+    <button class="dlg-close" onclick="closeDialog()">&times;</button>
   </div>
   <div class="dlg-body">
-    <input id="file" placeholder="文件名 (如: test.html)" oninput="checkFile()">
-    <textarea id="msg" placeholder="提交说明">代码编辑器提交</textarea>
-    <input id="token" placeholder="GitHub令牌 (ghp_...)" oninput="checkFile()">
-    <div id="fs" class="file-status wait">等待输入</div>
+    <input type="text" id="token" placeholder="GitHub Token (ghp_xxx)" oninput="checkFile()">
+    <input type="text" id="file" placeholder="文件路径 (例: test.html)" oninput="checkFile()">
+    <textarea id="msg" placeholder="提交信息"></textarea>
+    <div class="file-status wait" id="fs">等待输入</div>
   </div>
   <div class="dlg-foot">
     <button class="panel-btn gray" onclick="closeDialog()">取消</button>
-    <button class="panel-btn green" onclick="submitGitHub()">提交</button>
+    <button class="panel-btn" onclick="submitToGitHub()" id="submit-btn">提交</button>
   </div>
 </div>
 
-<!-- Monaco Editor (多CDN回退加载) -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
 <script>
-// CDN 源列表（按优先级排序，国内优先）
-const MONACO_CDNS = [
-  'https://cdn.staticfile.org/monaco-editor/0.44.0/min/vs',
-  'https://cdn.bootcdn.net/ajax/libs/monaco-editor/0.44.0/min/vs',
-  'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs',
-  'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs',
-  'https://unpkg.com/monaco-editor@0.44.0/min/vs'
-];
-const PYODIDE_CDNS = [
-  'https://cdn.bootcdn.net/ajax/libs/pyodide/0.24.1',
-  'https://cdn.jsdelivr.net/pyodide/v0.24.1/full',
-  'https://unpkg.com/pyodide@0.24.1/full'
-];
-
-// 动态加载脚本，支持回退
-function loadScriptWithFallback(urls, index) {
-  index = index || 0;
-  return new Promise((resolve, reject) => {
-    if (index >= urls.length) {
-      reject(new Error('所有CDN均加载失败'));
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = urls[index];
-    script.onload = () => resolve(urls[index]);
-    script.onerror = () => {
-      console.warn('CDN加载失败，尝试下一个:', urls[index]);
-      loadScriptWithFallback(urls, index + 1).then(resolve).catch(reject);
-    };
-    document.head.appendChild(script);
-  });
-}
-
-// 加载 Monaco loader
-window.__monacoBase = null;
-loadScriptWithFallback(MONACO_CDNS.map(u => u + '/loader.min.js'))
-  .then(() => {
-    // 找到成功的CDN，用于后续require.config
-    const successUrl = MONACO_CDNS.find(url => {
-      const scripts = document.querySelectorAll('script[src*="loader.min.js"]');
-      return Array.from(scripts).some(s => s.src.includes(url));
-    });
-    window.__monacoBase = successUrl || MONACO_CDNS[0];
-    console.log('Monaco loader 加载成功:', window.__monacoBase);
-  })
-  .catch(err => {
-    console.error('Monaco loader 全部加载失败:', err);
-    const loading = document.getElementById('loading');
-    if (loading) {
-      loading.innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器资源加载失败<br><small style="opacity:0.7;margin-top:10px;display:block">所有CDN均无法访问，请检查网络连接</small></div></div>';
-    }
-  });
-</script>
-<!-- Pyodide for Python (延迟加载) -->
-<script>
-// Pyodide 延迟加载，避免阻塞页面
-window.__pyodideBase = null;
-function loadPyodideScript() {
-  if (window.__pyodideBase) return Promise.resolve(window.__pyodideBase);
-  return loadScriptWithFallback(PYODIDE_CDNS.map(u => u + '/pyodide.js'))
-    .then(() => {
-      window.__pyodideBase = PYODIDE_CDNS.find(url => {
-        const scripts = document.querySelectorAll('script[src*="pyodide.js"]');
-        return Array.from(scripts).some(s => s.src.includes(url));
-      }) || PYODIDE_CDNS[0];
-      console.log('Pyodide 加载成功:', window.__pyodideBase);
-      return window.__pyodideBase;
-    });
-}
-</script>
-
-<script>
-// ===== 全局状态 =====
-let currentLang = 'html';
+// ===== 全局变量 =====
 let editor = null;
+let currentLang = 'html';
 let pyodide = null;
 let pyodideLoading = false;
-let sha = null, checking = false;
+let checking = false;
+let sha = null;
 
 const codeStore = {
   html: '',
@@ -529,13 +548,14 @@ const codeStore = {
   cpp: ''
 };
 
+// ===== 示例代码 =====
 const examples = {
-  html: '<!DOCTYPE html>\n<html>\n<head>\n  <title>Hello World</title>\n</head>\n<body>\n  <h1>Hello World!</h1>\n  <p>欢迎使用代码编辑器</p>\n  <button onclick="alert(\'你好！\')">点击我</button>\n</body>\n</html>',
-  css: '/* CSS 样式示例 */\nbody {\n  font-family: Arial, sans-serif;\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n  margin: 0;\n  padding: 20px;\n  min-height: 100vh;\n}\n\nh1 {\n  color: white;\n  text-align: center;\n  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);\n}\n\n.card {\n  background: white;\n  border-radius: 12px;\n  padding: 20px;\n  max-width: 400px;\n  margin: 20px auto;\n  box-shadow: 0 10px 30px rgba(0,0,0,0.2);\n}',
-  js: '// JavaScript 示例\nfunction greet(name) {\n  return `你好, ${name}!`;\n}\n\nconsole.log(greet("世界"));\n\n// 数组操作\nconst numbers = [1, 2, 3, 4, 5];\nconst doubled = numbers.map(n => n * 2);\nconsole.log("原始:", numbers);\nconsole.log("翻倍:", doubled);\n\n// 对象\nconst person = {\n  name: "张三",\n  age: 25,\n  hobbies: ["编程", "阅读", "游戏"]\n};\nconsole.log(person);',
-  full: '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>完整页面示例</title>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      background: #1e1e1e;\n      color: #d4d4d4;\n      padding: 20px;\n    }\n    .container {\n      max-width: 800px;\n      margin: 0 auto;\n    }\n    h1 {\n      color: #4ec9b0;\n    }\n    button {\n      background: #007acc;\n      color: white;\n      border: none;\n      padding: 10px 20px;\n      border-radius: 4px;\n      cursor: pointer;\n    }\n    button:hover {\n      background: #005a9e;\n    }\n  </style>\n</head>\n<body>\n  <div class="container">\n    <h1>完整页面模式</h1>\n    <p>在这里编写完整的 HTML 页面</p>\n    <button onclick="showTime()">显示时间</button>\n    <p id="time"></p>\n  </div>\n  <' + 'script>\n    function showTime() {\n      document.getElementById("time").textContent = \n        new Date().toLocaleString("zh-CN");\n    }\n  </' + 'script>\n</body>\n</html>',
+  html: '<!DOCTYPE html>\n<html>\n<head>\n  <title>示例页面</title>\n  <style>\n    body { font-family: Arial; padding: 20px; }\n    h1 { color: #007acc; }\n  </style>\n</head>\n<body>\n  <h1>Hello World!</h1>\n  <p>这是一个示例页面</p>\n  <button onclick="alert(\'点击成功!\')">点击我</button>\n</body>\n</html>',
+  css: '/* CSS 示例 */\nbody {\n  font-family: Arial, sans-serif;\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n  margin: 0;\n  padding: 20px;\n}\n\n.container {\n  max-width: 800px;\n  margin: 0 auto;\n  background: white;\n  padding: 30px;\n  border-radius: 10px;\n  box-shadow: 0 10px 40px rgba(0,0,0,0.2);\n}\n\nh1 {\n  color: #333;\n  border-bottom: 3px solid #667eea;\n  padding-bottom: 10px;\n}\n\nbutton {\n  background: #667eea;\n  color: white;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 5px;\n  cursor: pointer;\n  font-size: 16px;\n}\n\nbutton:hover {\n  background: #764ba2;\n}',
+  js: '// JavaScript 示例\nconsole.log("Hello, World!");\n\n// 数组操作\nconst numbers = [1, 2, 3, 4, 5];\nconst doubled = numbers.map(n => n * 2);\nconsole.log("原始数组:", numbers);\nconsole.log("翻倍后:", doubled);\n\n// 对象操作\nconst person = {\n  name: "张三",\n  age: 25,\n  city: "北京"\n};\nconsole.log("个人信息:", person);\n\n// 异步操作示例\nasync function fetchData() {\n  try {\n    console.log("开始获取数据...");\n    // 模拟 API 调用\n    await new Promise(resolve => setTimeout(resolve, 1000));\n    console.log("数据获取成功!");\n  } catch (error) {\n    console.error("获取失败:", error);\n  }\n}\n\nfetchData();',
+  full: '<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>完整页面示例</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body {\n      font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif;\n      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n      min-height: 100vh;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      padding: 20px;\n    }\n    .card {\n      background: white;\n      padding: 40px;\n      border-radius: 20px;\n      box-shadow: 0 20px 60px rgba(0,0,0,0.3);\n      max-width: 500px;\n      width: 100%;\n    }\n    h1 {\n      color: #333;\n      margin-bottom: 20px;\n      font-size: 2em;\n    }\n    p {\n      color: #666;\n      line-height: 1.6;\n      margin-bottom: 20px;\n    }\n    .btn {\n      display: inline-block;\n      background: linear-gradient(135deg, #667eea, #764ba2);\n      color: white;\n      padding: 12px 30px;\n      border-radius: 25px;\n      text-decoration: none;\n      font-weight: 600;\n      transition: transform 0.3s, box-shadow 0.3s;\n    }\n    .btn:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);\n    }\n  </style>\n</head>\n<body>\n  <div class="card">\n    <h1>欢迎!</h1>\n    <p>这是一个完整的 HTML 页面示例，包含了 HTML、CSS 和 JavaScript。</p>\n    <a href="#" class="btn" onclick="showMessage(); return false;">点击我</a>\n  </div>\n  <script>\n    function showMessage() {\n      alert("你好！这是一个交互式示例。");\n    }\n  </script>\n</body>\n</html>',
   python: '# Python 示例代码\n# 使用 Pyodide 在浏览器中运行\n\ndef fibonacci(n):\n    """计算斐波那契数列"""\n    if n <= 1:\n        return n\n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b\n\n# 打印前10个斐波那契数\nprint("斐波那契数列前10项:")\nfor i in range(10):\n    print(f"F({i}) = {fibonacci(i)}")\n\n# 列表操作\nnumbers = [1, 2, 3, 4, 5]\nsquares = [x**2 for x in numbers]\nprint(f"\\n原始列表: {numbers}")\nprint(f"平方列表: {squares}")\n\n# 字典操作\nperson = {"name": "张三", "age": 25, "city": "北京"}\nprint(f"\\n个人信息: {person}")',
-  cpp: '// C++ 示例代码\n#include <iostream>\n#include <vector>\n#include <algorithm>\n\nusing namespace std;\n\n// 计算斐波那契数列\nint fibonacci(int n) {\n    if (n <= 1) return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int temp = a + b;\n        a = b;\n        b = temp;\n    }\n    return b;\n}\n\nint main() {\n    cout << "斐波那契数列前10项:" << endl;\n    for (int i = 0; i < 10; i++) {\n        cout << "F(" << i << ") = " << fibonacci(i) << endl;\n    }\n    \n    // 向量操作\n    vector<int> numbers = {1, 2, 3, 4, 5};\n    vector<int> squares;\n    for (int n : numbers) {\n        squares.push_back(n * n);\n    }\n    \n    cout << "\\n原始向量: ";\n    for (int n : numbers) cout << n << " ";\n    cout << "\\n平方向量: ";\n    for (int n : squares) cout << n << " ";\n    cout << endl;\n    \n    return 0;\n}'
+  cpp: '// C++ 示例代码\n#include <iostream>\n#include <vector>\n#include <string>\n\nusing namespace std;\n\n// 计算斐波那契数列\nint fibonacci(int n) {\n    if (n <= 1) return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int temp = a + b;\n        a = b;\n        b = temp;\n    }\n    return b;\n}\n\nint main() {\n    cout << "斐波那契数列前10项:" << endl;\n    for (int i = 0; i < 10; i++) {\n        cout << "F(" << i << ") = " << fibonacci(i) << endl;\n    }\n    \n    // 向量操作\n    vector<int> numbers = {1, 2, 3, 4, 5};\n    vector<int> squares;\n    for (int n : numbers) {\n        squares.push_back(n * n);\n    }\n    \n    cout << "\\n原始向量: ";\n    for (int n : numbers) cout << n << " ";\n    cout << "\\n平方向量: ";\n    for (int n : squares) cout << n << " ";\n    cout << endl;\n    \n    return 0;\n}'
 };
 
 const langConfig = {
@@ -549,42 +569,31 @@ const langConfig = {
 
 // ===== 初始化 =====
 let monacoReady = false;
-
 window.addEventListener('load', () => {
-  // 显示加载提示
   document.getElementById('loading').classList.add('show');
   updateStatus('正在加载编辑器...');
   
-  // 添加加载超时处理（30秒，给CDN回退足够时间）
   const loadingTimeout = setTimeout(() => {
     if (!monacoReady) {
       const loading = document.getElementById('loading');
-      loading.innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载超时<br><small style="opacity:0.7;margin-top:10px;display:block">所有CDN均无法访问，请检查网络连接或刷新页面重试</small></div></div>';
+      loading.innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载超时<br><small>请检查网络连接或刷新页面重试</small></div></div>';
       updateStatus('加载失败');
     }
   }, 30000);
   
-  // 等待 Monaco loader 加载完成后再初始化
   function initMonaco() {
     if (typeof require === 'undefined') {
-      // loader 还未加载，继续等待
       setTimeout(initMonaco, 200);
       return;
     }
     
     try {
-      // 使用成功加载的CDN路径
-      const vsPath = window.__monacoBase || MONACO_CDNS[0];
-      require.config({ 
-        paths: { vs: vsPath }
-      });
-      
+      require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
       require(['vs/editor/editor.main'], function () {
         clearTimeout(loadingTimeout);
         monacoReady = true;
         
         try {
-          // 创建编辑器
           editor = monaco.editor.create(document.getElementById('monaco-editor'), {
             value: examples.html,
             language: 'html',
@@ -602,8 +611,7 @@ window.addEventListener('load', () => {
             smoothScrolling: true,
             mouseWheelZoom: true
           });
-        
-          // 监听内容变化
+          
           editor.onDidChangeModelContent(() => {
             codeStore[currentLang] = editor.getValue();
             if (currentLang !== 'python' && currentLang !== 'cpp') {
@@ -611,35 +619,28 @@ window.addEventListener('load', () => {
               window._autoRun = setTimeout(runCode, 800);
             }
           });
-        
-          // 监听光标位置
+          
           editor.onDidChangeCursorPosition((e) => {
             document.getElementById('status-line').textContent = `行 ${e.position.lineNumber}, 列 ${e.position.column}`;
           });
           
-          // 隐藏加载提示
           document.getElementById('loading').classList.remove('show');
-          
-          // 运行初始代码
           runWeb(examples.html);
-          
           updateStatus('就绪');
-          
         } catch (e) {
           console.error('Monaco Editor 创建失败:', e);
-          document.getElementById('loading').innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器初始化失败<br><small style="opacity:0.7;margin-top:10px;display:block">' + e.message + '</small></div></div>';
+          document.getElementById('loading').innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器初始化失败<br><small>' + e.message + '</small></div></div>';
           updateStatus('初始化失败');
         }
       });
     } catch (err) {
       clearTimeout(loadingTimeout);
       console.error('Monaco Editor 加载器错误:', err);
-      document.getElementById('loading').innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载失败<br><small style="opacity:0.7;margin-top:10px;display:block">无法加载编辑器组件</small></div></div>';
+      document.getElementById('loading').innerHTML = '<div class="loading-content"><div class="loading-spinner" style="color:#f48771"><i class="fa-solid fa-exclamation-triangle"></i></div><div class="loading-text">编辑器加载失败<br><small>无法加载编辑器组件</small></div></div>';
       updateStatus('加载失败');
     }
   }
   
-  // 延迟启动初始化
   setTimeout(initMonaco, 300);
 });
 
@@ -651,16 +652,23 @@ async function initPyodide() {
   try {
     addTerminalLine('正在加载 Python 运行环境 (Pyodide)...');
     
-    // 先加载 Pyodide 脚本（多CDN回退）
-    await loadPyodideScript();
-    
-    // 使用成功加载的CDN路径初始化
-    const pyodideBase = window.__pyodideBase || PYODIDE_CDNS[0];
-    pyodide = await loadPyodide({
-      indexURL: pyodideBase + '/'
-    });
-    addTerminalLine('✓ Python 运行环境加载完成');
-    pyodideLoading = false;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+    script.onload = async () => {
+      try {
+        pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/' });
+        addTerminalLine('✓ Python 运行环境加载完成');
+        pyodideLoading = false;
+      } catch (e) {
+        addTerminalLine('✗ Python 运行环境加载失败: ' + e.message);
+        pyodideLoading = false;
+      }
+    };
+    script.onerror = () => {
+      addTerminalLine('✗ Pyodide 脚本加载失败');
+      pyodideLoading = false;
+    };
+    document.head.appendChild(script);
   } catch (e) {
     addTerminalLine('✗ Python 运行环境加载失败: ' + e.message);
     pyodideLoading = false;
@@ -669,24 +677,15 @@ async function initPyodide() {
 
 // ===== 语言切换 =====
 function setLang(lang) {
-  // 保存当前代码
-  codeStore[currentLang] = editor.getValue();
+  if (!editor) return;
   
-  // 切换语言
+  codeStore[currentLang] = editor.getValue();
   currentLang = lang;
   const config = langConfig[lang];
   
-  // 更新编辑器内容
   editor.setValue(codeStore[lang] || examples[lang] || '');
+  monaco.editor.setModelLanguage(editor.getModel(), lang === 'cpp' ? 'cpp' : lang === 'full' ? 'html' : lang);
   
-  // 更新 Monaco 语言
-  monaco.editor.setModelLanguage(editor.getModel(), 
-    lang === 'cpp' ? 'cpp' : 
-    lang === 'full' ? 'html' : 
-    lang
-  );
-  
-  // 更新侧边栏
   document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
   const fileItems = document.querySelectorAll('.file-item');
   const langIndex = ['html', 'css', 'js', 'full', 'python', 'cpp'].indexOf(lang);
@@ -694,29 +693,30 @@ function setLang(lang) {
     fileItems[langIndex].classList.add('active');
   }
   
-  // 更新标签栏
   document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.remove('active');
     if (tab.dataset.lang === lang) tab.classList.add('active');
   });
   
-  // 更新面包屑
   document.getElementById('breadcrumb-file').textContent = config.file;
-  
-  // 更新状态栏
   document.getElementById('status-lang').textContent = config.name;
   
-  // 切换到 Python 时触发 Pyodide 加载
+  const debugLang = document.getElementById('debug-lang');
+  if (debugLang) {
+    debugLang.textContent = config.name;
+  }
+  
   if (lang === 'python' && !pyodide && !pyodideLoading) {
     initPyodide();
   }
   
-  // 运行代码
   runCode();
 }
 
 // ===== 运行代码 =====
 function runCode() {
+  if (!editor) return;
+  
   const code = editor.getValue();
   if (!code.trim()) {
     showOutput('代码为空');
@@ -757,7 +757,7 @@ async function runPython(code) {
   showPanel('output');
   showOutput('<div class="out-info"><i class="fa-solid fa-spinner fa-spin"></i> 正在运行 Python 代码...</div>');
   
-  // 方案1: Wandbox API (免费，支持CORS)
+  // 方案1: Wandbox API
   try {
     const response = await fetch('https://wandbox.org/api/compile.json', {
       method: 'POST',
@@ -813,7 +813,7 @@ async function runPython(code) {
     console.warn('Vercel 代理失败:', e.message);
   }
   
-  // 方案3: Pyodide 浏览器端运行
+  // 方案3: Pyodide
   if (pyodide) {
     try {
       pyodide.runPython(`
@@ -843,7 +843,6 @@ sys.stderr = sys.__stderr__
     }
   }
   
-  // 所有方案都失败
   showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行失败</div><div class="out-info">所有编译服务均不可用，请检查网络连接后刷新页面重试</div>');
   updateStatus('Python 运行失败');
 }
@@ -853,7 +852,7 @@ async function runCpp(code) {
   showPanel('output');
   showOutput('<div class="out-info"><i class="fa-solid fa-spinner fa-spin"></i> 正在编译运行 C++ 代码...</div>');
   
-  // 方案1: Wandbox API (免费，支持CORS)
+  // 方案1: Wandbox API
   try {
     const response = await fetch('https://wandbox.org/api/compile.json', {
       method: 'POST',
@@ -914,7 +913,7 @@ async function runCpp(code) {
     console.warn('Vercel 代理失败:', e.message);
   }
   
-  // 方案3: Piston API (回退)
+  // 方案3: Piston API
   try {
     const response = await fetch('https://emkc.org/api/v2/piston/execute', {
       method: 'POST',
@@ -947,14 +946,15 @@ async function runCpp(code) {
     console.warn('Piston API 失败:', e.message);
   }
   
-  // 所有方案都失败
   showOutput('<div class="out-err"><i class="fa-solid fa-circle-exclamation"></i> 运行失败</div><div class="out-info">所有编译服务均不可用，请检查网络连接后刷新页面重试</div>');
   updateStatus('C++ 运行失败');
 }
 
 // ===== 辅助函数 =====
-function escapeHtml(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 function showOutput(html) {
@@ -962,51 +962,46 @@ function showOutput(html) {
 }
 
 function showPanel(type) {
-  const previewArea = document.getElementById('preview-area');
-  const outputArea = document.getElementById('output-area');
-  const tabs = document.querySelectorAll('.panel-tab');
+  document.querySelectorAll('.panel-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelector(`.panel-tab[onclick*="${type}"]`).classList.add('active');
   
-  tabs.forEach(tab => tab.classList.remove('active'));
-  
-  if (type === 'preview') {
-    previewArea.style.display = 'block';
-    outputArea.style.display = 'none';
-    tabs[0].classList.add('active');
-    document.getElementById('panel-title').textContent = '预览';
-  } else {
-    previewArea.style.display = 'none';
-    outputArea.style.display = 'block';
-    tabs[1].classList.add('active');
-    document.getElementById('panel-title').textContent = '输出';
-  }
+  document.getElementById('preview-area').style.display = type === 'preview' ? 'block' : 'none';
+  document.getElementById('output-area').style.display = type === 'output' ? 'block' : 'none';
+  document.getElementById('panel-title').textContent = type === 'preview' ? '预览' : '输出';
 }
 
 function updateStatus(text) {
-  document.getElementById('status-time').textContent = new Date().toLocaleTimeString('zh-CN');
+  document.getElementById('status').textContent = text;
 }
 
-function updateStatusLine() {
-  // 由 Monaco 事件处理
+function addTerminalLine(text) {
+  const terminal = document.getElementById('terminal-body');
+  const line = document.createElement('div');
+  line.className = 'terminal-line';
+  line.innerHTML = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
 }
 
-// ===== 示例/全屏 =====
-function loadExample() {
-  editor.setValue(examples[currentLang] || '');
-  codeStore[currentLang] = editor.getValue();
-  runCode();
-  updateStatus('已载入示例');
-}
-
-function fullscreen() {
-  const panel = document.querySelector('.right-panel');
-  if (!document.fullscreenElement) {
-    panel.requestFullscreen && panel.requestFullscreen();
-  } else {
-    document.exitFullscreen && document.exitFullscreen();
+// ===== 侧边栏功能 =====
+function switchActivity(btn, type) {
+  document.querySelectorAll('.activity-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  document.querySelectorAll('.sidebar-panel').forEach(p => p.style.display = 'none');
+  
+  const panel = document.getElementById('panel-' + type);
+  if (panel) {
+    panel.style.display = 'flex';
+    if (type === 'debug') {
+      const debugLang = document.getElementById('debug-lang');
+      if (debugLang) {
+        debugLang.textContent = langConfig[currentLang]?.name || currentLang;
+      }
+    }
   }
 }
 
-// ===== 侧边栏/终端切换 =====
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
@@ -1017,65 +1012,128 @@ function toggleTerminal() {
   terminal.style.display = terminal.style.display === 'none' ? 'flex' : 'none';
 }
 
-function switchActivity(btn, type) {
-  document.querySelectorAll('.activity-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+// ===== 菜单功能 =====
+function toggleMenu(menuId) {
+  const menu = document.getElementById(menuId);
+  const isShowing = menu.classList.contains('show');
   
-  // 隐藏所有面板
-  document.querySelectorAll('.sidebar-panel').forEach(p => p.style.display = 'none');
+  // 关闭所有菜单
+  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
   
-  // 显示对应面板
-  const panel = document.getElementById('panel-' + type);
-  if (panel) {
-    panel.style.display = 'flex';
-    // 更新调试面板的语言显示
-    if (type === 'debug') {
-      const debugLang = document.getElementById('debug-lang');
-      if (debugLang) {
-        debugLang.textContent = langConfig[currentLang]?.name || currentLang;
-      }
-    }
+  // 如果之前没显示，则显示当前菜单
+  if (!isShowing) {
+    menu.classList.add('show');
   }
 }
 
-function addTerminalLine(text) {
-  const body = document.getElementById('terminal-body');
-  const inputLine = body.lastElementChild;
-  const line = document.createElement('div');
-  line.className = 'terminal-line';
-  line.innerHTML = '<span class="terminal-prompt">$</span> ' + text;
-  body.insertBefore(line, inputLine);
-  body.scrollTop = body.scrollHeight;
-}
+// 点击其他地方关闭菜单
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.menu-item')) {
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+  }
+});
 
-function executeCommand() {
-  const input = document.getElementById('terminal-input');
-  const cmd = input.value.trim();
-  if (!cmd) return;
+// ===== 编辑器操作 =====
+function editorAction(action) {
+  if (!editor) return;
   
-  addTerminalLine(cmd);
-  input.value = '';
-  
-  if (cmd === 'help') {
-    addTerminalLine('可用命令: help, clear, run, lang');
-  } else if (cmd === 'clear') {
-    const body = document.getElementById('terminal-body');
-    const inputLine = body.lastElementChild;
-    body.innerHTML = '';
-    body.appendChild(inputLine);
-  } else if (cmd === 'run') {
-    runCode();
-    addTerminalLine('代码已运行');
-  } else if (cmd === 'lang') {
-    addTerminalLine('当前语言: ' + langConfig[currentLang].name);
-  } else {
-    addTerminalLine('未知命令: ' + cmd);
+  switch(action) {
+    case 'undo':
+      editor.trigger('keyboard', 'undo');
+      break;
+    case 'redo':
+      editor.trigger('keyboard', 'redo');
+      break;
+    case 'cut':
+      editor.trigger('keyboard', 'editor.action.clipboardCutAction');
+      break;
+    case 'copy':
+      editor.trigger('keyboard', 'editor.action.clipboardCopyAction');
+      break;
+    case 'paste':
+      editor.trigger('keyboard', 'editor.action.clipboardPasteAction');
+      break;
+    case 'selectAll':
+      editor.trigger('keyboard', 'editor.action.selectAll');
+      break;
+    case 'expandSelection':
+      editor.trigger('keyboard', 'editor.action.smartSelect.expand');
+      break;
+    case 'shrinkSelection':
+      editor.trigger('keyboard', 'editor.action.smartSelect.shrink');
+      break;
+    case 'selectLine':
+      editor.trigger('keyboard', 'editor.action.selectCurrentLine');
+      break;
+    case 'selectWord':
+      editor.trigger('keyboard', 'editor.action.wordHighlight.trigger');
+      break;
+    case 'zoomIn':
+      const fontSize1 = editor.getOption(monaco.editor.EditorOption.fontSize);
+      editor.updateOptions({ fontSize: fontSize1 + 1 });
+      break;
+    case 'zoomOut':
+      const fontSize2 = editor.getOption(monaco.editor.EditorOption.fontSize);
+      editor.updateOptions({ fontSize: Math.max(8, fontSize2 - 1) });
+      break;
+    case 'resetZoom':
+      editor.updateOptions({ fontSize: 14 });
+      break;
+    case 'toggleMinimap':
+      const minimap = editor.getOption(monaco.editor.EditorOption.minimap);
+      editor.updateOptions({ minimap: { enabled: !minimap.enabled } });
+      break;
+    case 'toggleWordWrap':
+      const wordWrap = editor.getOption(monaco.editor.EditorOption.wordWrap);
+      editor.updateOptions({ wordWrap: wordWrap === 'on' ? 'off' : 'on' });
+      break;
   }
 }
 
-// ===== 侧边栏功能函数 =====
+// ===== 文件操作 =====
+function newFile() {
+  if (confirm('确定要新建文件吗？当前未保存的更改将丢失。')) {
+    editor.setValue('');
+    codeStore[currentLang] = '';
+    updateStatus('新文件已创建');
+  }
+}
 
-// 搜索功能
+function downloadCode() {
+  const code = editor.getValue();
+  const config = langConfig[currentLang];
+  const blob = new Blob([code], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = config.file;
+  a.click();
+  URL.revokeObjectURL(url);
+  addTerminalLine('✓ 代码已下载: ' + config.file);
+  updateStatus('代码已下载');
+}
+
+function loadExample() {
+  editor.setValue(examples[currentLang] || '');
+  runCode();
+  addTerminalLine('✓ 已加载示例代码');
+  updateStatus('示例已加载');
+}
+
+function fullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
+  }
+}
+
+// ===== 搜索和替换 =====
 function performSearch() {
   const searchInput = document.getElementById('search-input');
   const searchTerm = searchInput.value;
@@ -1097,7 +1155,6 @@ function performSearch() {
   
   if (matches.length > 0) {
     resultsDiv.innerHTML = `<span style="color:#4cc9f0">找到 ${matches.length} 个匹配</span>`;
-    // 高亮第一个匹配
     const firstMatch = matches[0];
     const position = editor.getModel().getPositionAt(firstMatch);
     editor.setPosition(position);
@@ -1108,7 +1165,6 @@ function performSearch() {
   }
 }
 
-// 替换功能
 function performReplace() {
   const searchInput = document.getElementById('search-input');
   const replaceInput = document.getElementById('replace-input');
@@ -1134,7 +1190,7 @@ function performReplace() {
   }
 }
 
-// 保存到本地存储
+// ===== 本地存储 =====
 function saveToLocalStorage() {
   if (!editor) return;
   
@@ -1152,7 +1208,6 @@ function saveToLocalStorage() {
   }
 }
 
-// 从本地存储加载
 function loadFromLocalStorage() {
   if (!editor) return;
   
@@ -1176,7 +1231,6 @@ function loadFromLocalStorage() {
   }
 }
 
-// 清除本地存储
 function clearLocalStorage() {
   try {
     const keys = Object.keys(localStorage).filter(k => k.startsWith('code_'));
@@ -1189,7 +1243,6 @@ function clearLocalStorage() {
   }
 }
 
-// 格式化代码
 function formatCode() {
   if (!editor) return;
   
@@ -1201,6 +1254,26 @@ function formatCode() {
     addTerminalLine('✗ 格式化失败: ' + e.message);
     updateStatus('格式化失败');
   }
+}
+
+// ===== 终端命令 =====
+function terminalCommand(cmd) {
+  if (cmd === 'clear') {
+    document.getElementById('terminal-body').innerHTML = '<div class="terminal-line"><span class="terminal-prompt">$</span> 终端已清除</div>';
+  } else if (cmd === 'help') {
+    addTerminalLine('可用命令:');
+    addTerminalLine('  clear - 清除终端');
+    addTerminalLine('  help  - 显示帮助');
+  }
+}
+
+// ===== 帮助功能 =====
+function showAbout() {
+  alert('代码编辑器 v1.0\n\n基于 Monaco Editor\n支持 HTML, CSS, JavaScript, Python, C++\n\nPython 使用 Pyodide 在浏览器中运行\nC++ 使用 Wandbox API 编译');
+}
+
+function showShortcuts() {
+  alert('快捷键:\n\nCtrl+S - 保存代码\nCtrl+Z - 撤销\nCtrl+Y - 重做\nCtrl+A - 全选\nF5 - 运行代码\nCtrl++ - 放大\nCtrl+- - 缩小');
 }
 
 // ===== GitHub 提交 =====
@@ -1234,101 +1307,109 @@ async function checkFile() {
     return;
   }
   
-  if (!t.startsWith('ghp_') && !t.startsWith('github_pat_')) {
-    s.className = 'file-status err';
-    s.textContent = '令牌格式错误';
-    sha = null;
-    checking = false;
-    return;
-  }
-  
   s.className = 'file-status wait';
   s.textContent = '检查中...';
   
   try {
-    let r = await fetch('https://api.github.com/repos/fsywed/fsywed.github.io/contents/' + f, {
-      headers: { 'Authorization': 'token ' + t }
+    const res = await fetch(`https://api.github.com/repos/${f}`, {
+      headers: { 'Authorization': `token ${t}` }
     });
     
-    if (r.ok) {
-      let d = await r.json();
-      sha = d.sha;
+    if (res.status === 200) {
+      const data = await res.json();
+      sha = data.sha;
       s.className = 'file-status ok';
-      s.textContent = '📝 覆盖文件';
-    } else if (r.status === 404) {
+      s.textContent = '文件存在，将更新';
+    } else if (res.status === 404) {
       sha = null;
       s.className = 'file-status new';
-      s.textContent = '📄 新建文件';
+      s.textContent = '文件不存在，将创建';
     } else {
-      sha = null;
       s.className = 'file-status err';
-      s.textContent = '检查失败 ' + r.status;
+      s.textContent = '检查失败';
+      sha = null;
     }
   } catch (e) {
-    sha = null;
     s.className = 'file-status err';
-    s.textContent = '网络错误';
+    s.textContent = '检查失败: ' + e.message;
+    sha = null;
   }
   
   checking = false;
 }
 
-async function submitGitHub() {
-  let f = document.getElementById('file').value.trim() || 'test.html';
+async function submitToGitHub() {
+  let f = document.getElementById('file').value.trim();
   let t = document.getElementById('token').value.trim();
   let m = document.getElementById('msg').value.trim();
-  let c = editor.getValue();
+  let s = document.getElementById('fs');
   
-  if (!t || (!t.startsWith('ghp_') && !t.startsWith('github_pat_'))) {
-    alert('需要有效的 GitHub 令牌');
+  if (!f || !t || !m) {
+    s.className = 'file-status err';
+    s.textContent = '请填写所有字段';
     return;
   }
   
-  updateStatus('提交中...');
+  s.className = 'file-status wait';
+  s.textContent = '提交中...';
   
   try {
-    let p = {
-      message: m || '提交 ' + new Date().toLocaleTimeString('zh-CN'),
-      content: btoa(unescape(encodeURIComponent(c))),
-      branch: 'main'
+    const code = editor.getValue();
+    const content = btoa(unescape(encodeURIComponent(code)));
+    
+    const body = {
+      message: m,
+      content: content
     };
     
-    if (sha) p.sha = sha;
+    if (sha) body.sha = sha;
     
-    let r = await fetch('https://api.github.com/repos/fsywed/fsywed.github.io/contents/' + f, {
+    const res = await fetch(`https://api.github.com/repos/${f}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + t,
+        'Authorization': `token ${t}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(p)
+      body: JSON.stringify(body)
     });
     
-    if (r.ok) {
-      updateStatus('✓ 提交成功');
-      alert(sha ? '✓ 文件已覆盖' : '✓ 文件已创建');
+    if (res.ok) {
+      s.className = 'file-status ok';
+      s.textContent = '提交成功!';
       localStorage.setItem('token', t);
-      closeDialog();
+      setTimeout(closeDialog, 1500);
     } else {
-      let e = await r.json();
-      throw new Error(e.message || '错误 ' + r.status);
+      const err = await res.json();
+      s.className = 'file-status err';
+      s.textContent = '提交失败: ' + (err.message || '未知错误');
     }
   } catch (e) {
-    updateStatus('✗ 提交失败');
-    alert('提交失败: ' + e.message);
+    s.className = 'file-status err';
+    s.textContent = '提交失败: ' + e.message;
   }
 }
 
 // ===== 键盘快捷键 =====
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeDialog();
+  if (e.ctrlKey || e.metaKey) {
+    switch(e.key) {
+      case 's':
+        e.preventDefault();
+        saveToLocalStorage();
+        break;
+      case '=':
+      case '+':
+        e.preventDefault();
+        editorAction('zoomIn');
+        break;
+      case '-':
+        e.preventDefault();
+        editorAction('zoomOut');
+        break;
+    }
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    updateStatus('已保存');
-  }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+  
+  if (e.key === 'F5') {
     e.preventDefault();
     runCode();
   }
