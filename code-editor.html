@@ -202,39 +202,135 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#1e1e1e;color:#d4d4d4;he
 
   <!-- 侧边栏 -->
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <span>资源管理器</span>
-      <i class="fa-solid fa-ellipsis" style="cursor:pointer"></i>
+    <!-- 资源管理器面板 -->
+    <div class="sidebar-panel" id="panel-explorer">
+      <div class="sidebar-header">
+        <span>资源管理器</span>
+        <i class="fa-solid fa-ellipsis" style="cursor:pointer"></i>
+      </div>
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-chevron-down" style="font-size:10px"></i>
+            工作区
+          </div>
+          <div class="file-item active" onclick="setLang('html')">
+            <i class="fa-brands fa-html5"></i>
+            <span>index.html</span>
+          </div>
+          <div class="file-item" onclick="setLang('css')">
+            <i class="fa-brands fa-css3-alt"></i>
+            <span>style.css</span>
+          </div>
+          <div class="file-item" onclick="setLang('js')">
+            <i class="fa-brands fa-js"></i>
+            <span>script.js</span>
+          </div>
+          <div class="file-item" onclick="setLang('full')">
+            <i class="fa-solid fa-globe"></i>
+            <span>page.html</span>
+          </div>
+          <div class="file-item" onclick="setLang('python')">
+            <i class="fa-brands fa-python"></i>
+            <span>main.py</span>
+          </div>
+          <div class="file-item" onclick="setLang('cpp')">
+            <i class="fa-solid fa-hashtag"></i>
+            <span>main.cpp</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="sidebar-content">
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">
-          <i class="fa-solid fa-chevron-down" style="font-size:10px"></i>
-          工作区
+
+    <!-- 搜索面板 -->
+    <div class="sidebar-panel" id="panel-search" style="display:none">
+      <div class="sidebar-header">
+        <span>搜索</span>
+      </div>
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <input type="text" id="search-input" placeholder="搜索..." style="width:100%;padding:6px 10px;background:#3c3c3c;border:1px solid #555;color:#d4d4d4;border-radius:4px;font-size:12px;margin-bottom:8px">
+          <input type="text" id="replace-input" placeholder="替换..." style="width:100%;padding:6px 10px;background:#3c3c3c;border:1px solid #555;color:#d4d4d4;border-radius:4px;font-size:12px;margin-bottom:8px">
+          <button onclick="performSearch()" style="width:100%;padding:6px;background:#0e639c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:4px">搜索</button>
+          <button onclick="performReplace()" style="width:100%;padding:6px;background:#16825d;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:8px">替换全部</button>
+          <div id="search-results" style="font-size:12px;color:#999;padding:4px"></div>
         </div>
-        <div class="file-item active" onclick="setLang('html')">
-          <i class="fa-brands fa-html5"></i>
-          <span>index.html</span>
+      </div>
+    </div>
+
+    <!-- 源代码管理面板 -->
+    <div class="sidebar-panel" id="panel-git" style="display:none">
+      <div class="sidebar-header">
+        <span>源代码管理</span>
+      </div>
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-code-branch"></i>
+            更改
+          </div>
+          <div style="padding:8px 16px;font-size:12px;color:#999">
+            <div style="margin-bottom:8px">当前分支: <span style="color:#4cc9f0">main</span></div>
+            <button onclick="saveToLocalStorage()" style="width:100%;padding:6px;background:#0e639c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:4px">保存代码</button>
+            <button onclick="loadFromLocalStorage()" style="width:100%;padding:6px;background:#16825d;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:4px">加载代码</button>
+            <button onclick="clearLocalStorage()" style="width:100%;padding:6px;background:#d35400;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">清除缓存</button>
+          </div>
         </div>
-        <div class="file-item" onclick="setLang('css')">
-          <i class="fa-brands fa-css3-alt"></i>
-          <span>style.css</span>
+      </div>
+    </div>
+
+    <!-- 运行和调试面板 -->
+    <div class="sidebar-panel" id="panel-debug" style="display:none">
+      <div class="sidebar-header">
+        <span>运行和调试</span>
+      </div>
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-play"></i>
+            运行配置
+          </div>
+          <div style="padding:8px 16px;font-size:12px;color:#999">
+            <div style="margin-bottom:8px">当前语言: <span style="color:#4cc9f0" id="debug-lang">HTML</span></div>
+            <button onclick="runCode()" style="width:100%;padding:8px;background:#16825d;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:6px"><i class="fa-solid fa-play"></i> 运行代码</button>
+            <button onclick="loadExample()" style="width:100%;padding:6px;background:#0e639c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:4px">加载示例</button>
+            <button onclick="formatCode()" style="width:100%;padding:6px;background:#5a5a5a;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">格式化代码</button>
+          </div>
         </div>
-        <div class="file-item" onclick="setLang('js')">
-          <i class="fa-brands fa-js"></i>
-          <span>script.js</span>
-        </div>
-        <div class="file-item" onclick="setLang('full')">
-          <i class="fa-solid fa-globe"></i>
-          <span>page.html</span>
-        </div>
-        <div class="file-item" onclick="setLang('python')">
-          <i class="fa-brands fa-python"></i>
-          <span>main.py</span>
-        </div>
-        <div class="file-item" onclick="setLang('cpp')">
-          <i class="fa-solid fa-hashtag"></i>
-          <span>main.cpp</span>
+      </div>
+    </div>
+
+    <!-- 扩展面板 -->
+    <div class="sidebar-panel" id="panel-extensions" style="display:none">
+      <div class="sidebar-header">
+        <span>扩展</span>
+      </div>
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-puzzle-piece"></i>
+            已安装扩展
+          </div>
+          <div style="padding:8px 16px;font-size:12px">
+            <div style="color:#d4d4d4;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fa-solid fa-check-circle" style="color:#4cc9f0"></i>
+                <span>Monaco Editor</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fa-solid fa-check-circle" style="color:#4cc9f0"></i>
+                <span>Pyodide (Python)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <i class="fa-solid fa-check-circle" style="color:#4cc9f0"></i>
+                <span>Wandbox API</span>
+              </div>
+            </div>
+            <div style="color:#999;font-size:11px;margin-top:12px;padding-top:12px;border-top:1px solid #333">
+              <div style="margin-bottom:4px">编辑器版本: v1.0</div>
+              <div>支持语言: HTML, CSS, JS, Python, C++</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -924,6 +1020,22 @@ function toggleTerminal() {
 function switchActivity(btn, type) {
   document.querySelectorAll('.activity-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  
+  // 隐藏所有面板
+  document.querySelectorAll('.sidebar-panel').forEach(p => p.style.display = 'none');
+  
+  // 显示对应面板
+  const panel = document.getElementById('panel-' + type);
+  if (panel) {
+    panel.style.display = 'flex';
+    // 更新调试面板的语言显示
+    if (type === 'debug') {
+      const debugLang = document.getElementById('debug-lang');
+      if (debugLang) {
+        debugLang.textContent = langConfig[currentLang]?.name || currentLang;
+      }
+    }
+  }
 }
 
 function addTerminalLine(text) {
@@ -958,6 +1070,136 @@ function executeCommand() {
     addTerminalLine('当前语言: ' + langConfig[currentLang].name);
   } else {
     addTerminalLine('未知命令: ' + cmd);
+  }
+}
+
+// ===== 侧边栏功能函数 =====
+
+// 搜索功能
+function performSearch() {
+  const searchInput = document.getElementById('search-input');
+  const searchTerm = searchInput.value;
+  const resultsDiv = document.getElementById('search-results');
+  
+  if (!searchTerm || !editor) {
+    resultsDiv.innerHTML = '<span style="color:#f48771">请输入搜索内容</span>';
+    return;
+  }
+  
+  const code = editor.getValue();
+  const matches = [];
+  let index = code.indexOf(searchTerm);
+  
+  while (index !== -1) {
+    matches.push(index);
+    index = code.indexOf(searchTerm, index + 1);
+  }
+  
+  if (matches.length > 0) {
+    resultsDiv.innerHTML = `<span style="color:#4cc9f0">找到 ${matches.length} 个匹配</span>`;
+    // 高亮第一个匹配
+    const firstMatch = matches[0];
+    const position = editor.getModel().getPositionAt(firstMatch);
+    editor.setPosition(position);
+    editor.revealPosition(position);
+    editor.focus();
+  } else {
+    resultsDiv.innerHTML = '<span style="color:#f48771">未找到匹配</span>';
+  }
+}
+
+// 替换功能
+function performReplace() {
+  const searchInput = document.getElementById('search-input');
+  const replaceInput = document.getElementById('replace-input');
+  const searchTerm = searchInput.value;
+  const replaceTerm = replaceInput.value;
+  const resultsDiv = document.getElementById('search-results');
+  
+  if (!searchTerm || !editor) {
+    resultsDiv.innerHTML = '<span style="color:#f48771">请输入搜索内容</span>';
+    return;
+  }
+  
+  const code = editor.getValue();
+  const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+  const newCode = code.replace(regex, replaceTerm);
+  
+  if (newCode !== code) {
+    editor.setValue(newCode);
+    const matches = code.match(regex);
+    resultsDiv.innerHTML = `<span style="color:#4cc9f0">已替换 ${matches ? matches.length : 0} 处</span>`;
+  } else {
+    resultsDiv.innerHTML = '<span style="color:#f48771">未找到匹配</span>';
+  }
+}
+
+// 保存到本地存储
+function saveToLocalStorage() {
+  if (!editor) return;
+  
+  const code = editor.getValue();
+  const lang = currentLang;
+  
+  try {
+    localStorage.setItem(`code_${lang}`, code);
+    localStorage.setItem('code_timestamp', new Date().toISOString());
+    addTerminalLine('✓ 代码已保存到本地存储');
+    updateStatus('代码已保存');
+  } catch (e) {
+    addTerminalLine('✗ 保存失败: ' + e.message);
+    updateStatus('保存失败');
+  }
+}
+
+// 从本地存储加载
+function loadFromLocalStorage() {
+  if (!editor) return;
+  
+  const lang = currentLang;
+  
+  try {
+    const savedCode = localStorage.getItem(`code_${lang}`);
+    if (savedCode) {
+      editor.setValue(savedCode);
+      const timestamp = localStorage.getItem('code_timestamp');
+      const time = timestamp ? new Date(timestamp).toLocaleString('zh-CN') : '未知';
+      addTerminalLine('✓ 已加载保存的代码 (时间: ' + time + ')');
+      updateStatus('代码已加载');
+    } else {
+      addTerminalLine('✗ 未找到保存的代码');
+      updateStatus('未找到保存的代码');
+    }
+  } catch (e) {
+    addTerminalLine('✗ 加载失败: ' + e.message);
+    updateStatus('加载失败');
+  }
+}
+
+// 清除本地存储
+function clearLocalStorage() {
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('code_'));
+    keys.forEach(k => localStorage.removeItem(k));
+    addTerminalLine('✓ 已清除所有保存的代码');
+    updateStatus('缓存已清除');
+  } catch (e) {
+    addTerminalLine('✗ 清除失败: ' + e.message);
+    updateStatus('清除失败');
+  }
+}
+
+// 格式化代码
+function formatCode() {
+  if (!editor) return;
+  
+  try {
+    editor.getAction('editor.action.formatDocument').run();
+    addTerminalLine('✓ 代码已格式化');
+    updateStatus('代码已格式化');
+  } catch (e) {
+    addTerminalLine('✗ 格式化失败: ' + e.message);
+    updateStatus('格式化失败');
   }
 }
 
